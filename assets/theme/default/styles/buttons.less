@@ -1,0 +1,27 @@
+@import "colors";
+.btn-without-background(@fontColor) {
+  -fx-border-style: dashed;
+  -fx-border-color: rgba(0,0,0,0);
+  -fx-border-width: 1px;
+  -fx-background-color: @color-noting;
+  -fx-text-fill: @fontColor;
+  -fx-border-radius: 6px;
+
+  &:hover {
+    -fx-border-color: @fontColor;
+    -fx-effect: dropshadow(three-pass-box,@fontColor, 8, 0, 0, 0);
+  }
+
+}
+
+.btn-blocked(@background, @text) {
+  -fx-background-color: @background;
+  -fx-text-fill: @text;
+  -fx-border-width: 1px;
+  -fx-border-color: @color-noting;
+  -fx-background-radius: 8;
+  &:hover {
+    -fx-effect: dropshadow(three-pass-box,@background, 8, 0, 0, 0);
+  }
+}
+

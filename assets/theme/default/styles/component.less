@@ -1,0 +1,23 @@
+@import "colors";
+
+.text(@border){
+  -fx-background-color: rgba(255,255,255,0.6);
+  -fx-border-width: 0 0 2 0;
+  -fx-border-color: @border;
+  -fx-border-style: solid;
+  -fx-text-fill: @border;
+}
+
+.scrollable(@color) {
+  -fx-background-color: @color-noting;
+  -fx-font-size: 8;
+  .thumb {
+    -fx-background-color: @color;
+    -fx-effect: dropshadow(three-pass-box,@color, 8, 0, 0, 0);
+  }
+  .track {
+    -fx-background-color: rgba(255,255,255,0.6);
+    -fx-border-color: @color;
+    -fx-border-radius: 12;
+  }
+}

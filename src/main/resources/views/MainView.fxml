@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="488.0" prefWidth="706.0" styleClass="scene" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swdc.archive.ui.controller.MainController">
+   <center>
+      <BorderPane id="contentView" prefHeight="200.0" prefWidth="200.0" styleClass="view" BorderPane.alignment="CENTER" />
+   </center>
+   <top>
+      <ToolBar id="tools" prefHeight="64.0" prefWidth="643.0" BorderPane.alignment="CENTER">
+        <items>
+          <Button id="addFile" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="add" />
+            <Button id="removeFile" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="delete" />
+            <Button id="unArchive" layoutX="62.0" layoutY="13.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="unarchive" />
+        </items>
+      </ToolBar>
+   </top>
+</BorderPane>

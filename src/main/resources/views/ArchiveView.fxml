@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="469.0" prefWidth="727.0" styleClass="content-view" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swdc.archive.ui.controller.ArchiveViewController">
+   <center>
+      <SplitPane dividerPositions="0.3090128755364807" prefHeight="436.0" prefWidth="628.0" BorderPane.alignment="CENTER">
+         <items>
+            <TreeView fx:id="archiveTree" prefHeight="200.0" prefWidth="200.0" />
+            <TableView fx:id="contentTable" prefHeight="200.0" prefWidth="200.0">
+              <columns>
+                  <TableColumn fx:id="iconColumn" editable="false" prefWidth="47.0" resizable="false" sortable="false" />
+                <TableColumn fx:id="nameColumn" editable="false" prefWidth="188.0" text="名称" />
+                <TableColumn fx:id="sizeColumn" editable="false" prefWidth="149.0" text="大小" />
+                  <TableColumn fx:id="dateColumn" editable="false" prefWidth="170.0" text="修改日期" />
+              </columns>
+            </TableView>
+         </items>
+      </SplitPane>
+   </center>
+   <top>
+      <HBox alignment="CENTER" prefHeight="46.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <TextField fx:id="txtPath" editable="false" prefHeight="33.0" prefWidth="505.0" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </TextField>
+            <Button id="goBack" mnemonicParsing="false" onAction="#goBackLevel" prefHeight="28.0" prefWidth="28.0" styleClass="btn-no-bg" text="Button" HBox.hgrow="ALWAYS" />
+         </children>
+         <padding>
+            <Insets left="16.0" right="16.0" />
+         </padding>
+      </HBox>
+   </top>
+</BorderPane>

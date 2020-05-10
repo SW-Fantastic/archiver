@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="455.0" prefWidth="645.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swdc.archive.ui.controller.StartViewController">
+   <center>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="12.0" styleClass="content-view" BorderPane.alignment="CENTER">
+         <children>
+            <Button id="open" mnemonicParsing="false" onAction="#openArchiveFile" prefHeight="64.0" prefWidth="64.0" styleClass="btn-block" text="open" />
+            <Button id="create" layoutX="301.0" layoutY="206.0" mnemonicParsing="false" prefHeight="64.0" prefWidth="64.0" styleClass="btn-block" text="create" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+         </BorderPane.margin>
+      </HBox>
+   </center>
+</BorderPane>

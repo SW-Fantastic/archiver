@@ -1,0 +1,137 @@
+.scene {
+  -fx-background-size: cover;
+  -fx-font-family: "Noto Sans CJK DemiLight";
+}
+.scene .tool-bar {
+  -fx-background-color: rgba(255, 255, 255, 0.8);
+}
+.scene .tool-bar .button {
+  -fx-border-style: dashed;
+  -fx-border-color: rgba(0, 0, 0, 0);
+  -fx-border-width: 1px;
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-text-fill: #74a982;
+  -fx-border-radius: 6px;
+}
+.scene .tool-bar .button:hover {
+  -fx-border-color: #74a982;
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .tool-bar .tooltip {
+  -fx-font-size: 14;
+}
+.scene .scroll-bar {
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-font-size: 8;
+}
+.scene .scroll-bar .thumb {
+  -fx-background-color: #74a982;
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .scroll-bar .track {
+  -fx-background-color: rgba(255, 255, 255, 0.6);
+  -fx-border-color: #74a982;
+  -fx-border-radius: 12;
+}
+.scene .view {
+  -fx-background-color: rgba(255, 255, 255, 0.4);
+}
+.scene .content-view {
+  -fx-background-color: rgba(255, 255, 255, 0.6);
+  -fx-background-radius: 12;
+}
+.scene .content-view .btn-block {
+  -fx-background-color: #74a982;
+  -fx-text-fill: #fffcf2;
+  -fx-border-width: 1px;
+  -fx-border-color: rgba(255, 255, 255, 0);
+  -fx-background-radius: 8;
+}
+.scene .content-view .btn-block:hover {
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .content-view .btn-no-bg {
+  -fx-border-style: dashed;
+  -fx-border-color: rgba(0, 0, 0, 0);
+  -fx-border-width: 1px;
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-text-fill: #74a982;
+  -fx-border-radius: 6px;
+}
+.scene .content-view .btn-no-bg:hover {
+  -fx-border-color: #74a982;
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .content-view .text-field {
+  -fx-background-color: rgba(255, 255, 255, 0.6);
+  -fx-border-width: 0 0 2 0;
+  -fx-border-color: #74a982;
+  -fx-border-style: solid;
+  -fx-text-fill: #74a982;
+}
+.scene .content-view .split-pane {
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .content-view .split-pane .split-pane-divider {
+  -fx-background-color: rgba(245, 237, 240, 0.8);
+  -fx-padding: 0 1 0 1;
+}
+.scene .content-view .tree-view {
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .content-view .tree-view .tree-cell {
+  -fx-text-fill: #55917F;
+}
+.scene .content-view .tree-view .tree-cell:empty {
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .content-view .tree-view .tree-cell:filled {
+  -fx-background-color: rgba(255, 255, 255, 0.4);
+}
+.scene .content-view .tree-view .tree-cell:filled * {
+  -fx-text-fill: #55917f;
+}
+.scene .content-view .tree-view .tree-cell:filled:selected {
+  -fx-background-color: #74a982;
+  -fx-text-fill: #fffcf2;
+}
+.scene .content-view .tree-view .tree-cell:filled:selected .label,
+.scene .content-view .tree-view .tree-cell:filled:selected .arrow {
+  -fx-text-fill: #fffcf2;
+}
+.scene .content-view .table-view {
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .content-view .table-view .column-header-background {
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .content-view .table-view .column-header-background .filler {
+  -fx-background-color: #55917f;
+  -fx-background-radius: 6;
+}
+.scene .content-view .table-view .column-header {
+  -fx-background-color: #55917f;
+  -fx-background-radius: 6;
+}
+.scene .content-view .table-view .column-header .label {
+  -fx-text-fill: #fffcf2;
+}
+.scene .content-view .table-view .table-row-cell .cell {
+  -fx-alignment: center-left;
+}
+.scene .content-view .table-view .table-row-cell:empty {
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .content-view .table-view .table-row-cell:filled {
+  -fx-background-color: rgba(255, 255, 255, 0.4);
+  -fx-background-radius: 4;
+}
+.scene .content-view .table-view .table-row-cell:filled .label {
+  -fx-text-fill: #55917f;
+}
+.scene .content-view .table-view .table-row-cell:filled:selected {
+  -fx-background-color: #74a982;
+}
+.scene .content-view .table-view .table-row-cell:filled:selected .label {
+  -fx-text-fill: #fffcf2;
+}

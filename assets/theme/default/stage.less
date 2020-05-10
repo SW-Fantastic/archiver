@@ -1,0 +1,107 @@
+@import "styles/colors";
+@import "styles/buttons";
+@import "styles/component";
+
+@color-dark-green:#74A982;
+@color-text:#55917F;
+@color-background:#FFFCF2;
+
+.scene {
+  -fx-background-size: cover;
+  -fx-font-family: "Noto Sans CJK DemiLight";
+  .tool-bar {
+    -fx-background-color: rgba(255,255,255,0.8);
+    .button {
+      .btn-without-background(@color-dark-green)
+    }
+    .tooltip {
+      -fx-font-size: 14;
+    }
+  }
+  .scroll-bar {
+    .scrollable(@color-dark-green);
+  }
+  .view {
+    -fx-background-color: rgba(255,255,255,0.4);
+  }
+  .content-view {
+    -fx-background-color: rgba(255,255,255,0.6);
+    -fx-background-radius: 12;
+    .btn-block{
+      .btn-blocked(@color-dark-green,@color-background);
+    }
+    .btn-no-bg {
+      .btn-without-background(@color-dark-green);
+    }
+    .text-field {
+      .text(@color-dark-green)
+    }
+    .split-pane {
+      -fx-background-color: @color-noting;
+      .split-pane-divider{
+        -fx-background-color: rgba(245,237,240, 0.8);
+        -fx-padding: 0 1 0 1;
+      }
+    }
+    .tree-view {
+      -fx-background-color: @color-noting;
+      .tree-cell {
+        -fx-text-fill: #55917F;
+        &:empty {
+          -fx-background-color: @color-noting;
+        }
+        &:filled{
+          & *{
+            -fx-text-fill: @color-text;
+          }
+          -fx-background-color: rgba(255,255,255,0.4);
+          &:selected{
+            -fx-background-color: @color-dark-green;
+            -fx-text-fill: @color-background;
+            .label,.arrow {
+              -fx-text-fill: @color-background;
+            }
+          }
+        }
+      }
+    }
+    .table-view {
+      -fx-background-color: @color-noting;
+      .column-header-background {
+        -fx-background-color: @color-noting;
+        .filler {
+          -fx-background-color: @color-text;
+          -fx-background-radius: 6;
+        }
+      }
+      .column-header {
+        -fx-background-color: @color-text;
+        -fx-background-radius: 6;
+        .label {
+          -fx-text-fill: @color-background;
+        }
+      }
+      .table-row-cell{
+        .cell {
+          -fx-alignment: center-left;
+        }
+        &:empty {
+          -fx-background-color: @color-noting;
+        }
+        &:filled {
+          -fx-background-color: rgba(255,255,255,0.4);
+          -fx-background-radius: 4;
+          .label {
+            -fx-text-fill: @color-text;
+          }
+          &:selected{
+            .label {
+              -fx-text-fill: @color-background;
+            }
+            -fx-background-color: @color-dark-green;
+          }
+        }
+      }
+    }
+  }
+}

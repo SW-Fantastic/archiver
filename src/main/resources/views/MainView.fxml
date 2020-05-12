@@ -14,7 +14,7 @@
       <ToolBar id="tools" prefHeight="64.0" prefWidth="643.0" BorderPane.alignment="CENTER">
         <items>
           <Button id="addFile" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="add" />
-            <Button id="removeFile" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="delete" />
+            <Button id="removeFile" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" onAction="#removeFile" prefHeight="48.0" prefWidth="48.0" text="delete" />
             <Button id="unArchive" layoutX="62.0" layoutY="13.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="unarchive" />
         </items>
       </ToolBar>

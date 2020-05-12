@@ -128,6 +128,13 @@ public class ArchiveViewController extends FXController {
 
     public void refreshTree(ArchiveFile file) {
         archiveTree.setRoot(file.getRootEntry().toTreeItem(this));
+        archiveTree.getSelectionModel().select(archiveTree.getRoot());
+        contentTable.getItems().clear();
+        contentTable.getItems().addAll(file.getRootEntry().getChildren());
+    }
+
+    public void refreshCurrentView(){
+
     }
 
 }

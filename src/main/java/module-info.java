@@ -10,6 +10,8 @@ module fxArchive {
     requires fx.framework.resource;
     requires org.apache.commons.compress;
 
+    requires zip4j;
+
     opens org.swdc.archive.ui.view to
             javafx.fxml,
             fx.framework.core;

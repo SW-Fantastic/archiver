@@ -2,6 +2,8 @@ package org.swdc.archive.ui.view;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.ui.controller.ArchiveViewController;
 import org.swdc.fx.FXView;
@@ -30,6 +32,11 @@ public class ArchiveView extends FXView {
     public void refreshTree(ArchiveFile archiveFile) {
         ArchiveViewController controller = getLoader().getController();
         controller.refreshTree(archiveFile);
+    }
+
+    public ArchiveEntry getSelectedEntry() {
+        TableView<ArchiveEntry> view = this.findById("archiveTable");
+        return view.getSelectionModel().getSelectedItem();
     }
 
 }

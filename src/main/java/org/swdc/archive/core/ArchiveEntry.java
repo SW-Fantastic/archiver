@@ -96,7 +96,7 @@ public class ArchiveEntry {
         ArchiveEntry parent = this;
         while (parent != null) {
             stringBuilder.insert(0,parent.getFileName());
-            if (parent.getParent() != null) {
+            if (parent.getParent() != null && !parent.getParent().getFileName().equals("/")) {
                 stringBuilder.insert(0, '/');
             }
             parent = parent.getParent();

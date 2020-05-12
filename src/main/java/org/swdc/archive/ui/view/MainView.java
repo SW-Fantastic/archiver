@@ -7,6 +7,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.fx.FXView;
 import org.swdc.fx.anno.Aware;
@@ -86,6 +87,10 @@ public class MainView extends FXView {
 
     public synchronized ArchiveFile getArchiveFile() {
         return this.archiveFile;
+    }
+
+    public ArchiveEntry getSelectedEntry() {
+        return this.archiveView.getSelectedEntry();
     }
 
 }

@@ -10,7 +10,7 @@ public interface ArchiveProcessor {
 
     void addFile(ArchiveFile target, File file);
 
-    void removeFile(ArchiveFile target, ArchiveEntry entry);
+    boolean removeFile(ArchiveFile target, ArchiveEntry entry);
 
     void createArchive(File target);
 

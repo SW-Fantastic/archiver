@@ -11,10 +11,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
-import org.swdc.archive.ui.view.ArchiveView;
+import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.cells.IconColumnCell;
 import org.swdc.archive.ui.view.cells.IconTableColumnCell;
 import org.swdc.fx.FXController;
+import org.swdc.fx.anno.Listener;
 
 import java.net.URL;
 import java.util.Date;
@@ -108,6 +109,13 @@ public class ArchiveViewController extends FXController {
         }
     }
 
+    @Listener(ViewRefreshEvent.class)
+    public void refreshTable(ViewRefreshEvent refreshEvent) {
+        ArchiveEntry item = archiveTree.getSelectionModel().getSelectedItem().getValue();
+        contentTable.getItems().clear();
+        contentTable.getItems().addAll(item.getChildren());
+    }
+
     private void onTreeItemChange(Observable observable, TreeItem<ArchiveEntry> oldEntry, TreeItem<ArchiveEntry> newItem) {
         if (newItem == null) {
             return;
@@ -131,10 +139,6 @@ public class ArchiveViewController extends FXController {
         archiveTree.getSelectionModel().select(archiveTree.getRoot());
         contentTable.getItems().clear();
         contentTable.getItems().addAll(file.getRootEntry().getChildren());
-    }
-
-    public void refreshCurrentView(){
-
     }
 
 }

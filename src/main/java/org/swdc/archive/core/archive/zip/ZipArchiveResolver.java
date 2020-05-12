@@ -2,15 +2,13 @@ package org.swdc.archive.core.archive.zip;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.model.ZipHeader;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.ui.events.ViewRefreshEvent;
 
 import java.io.File;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 
 public class ZipArchiveResolver extends ArchiveResolver {
@@ -19,22 +17,16 @@ public class ZipArchiveResolver extends ArchiveResolver {
     public ArchiveFile loadFile(File file) {
         try {
             ZipArchiveFile zipArchiveFile = new ZipArchiveFile(file);
-            // org.apache.commons.compress.archivers.zip.ZipFile zipFile = new org.apache.commons.compress.archivers.zip.ZipFile(file);
             ZipFile zipFile = new ZipFile(file);
             ArchiveEntry rootEntry = new ArchiveEntry();
             rootEntry.setFileName("/");
             rootEntry.setDictionary(true);
-            //Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
-            /* while (entries.hasMoreElements()) {
-                ZipArchiveEntry archiveEntry = entries.nextElement();
-                resolveEntry(rootEntry, archiveEntry);
-            } */
+
             List<FileHeader> headers = zipFile.getFileHeaders();
             for (FileHeader header: headers) {
                 resolveEntry(rootEntry, header);
             }
             zipArchiveFile.setRoot(rootEntry);
-            //zipFile.close();
             return zipArchiveFile;
         } catch (Exception e){
             logger.error("fail to load ZipFile: ",e);
@@ -79,22 +71,29 @@ public class ZipArchiveResolver extends ArchiveResolver {
     }
 
     @Override
-    public void removeFile(ArchiveFile target, ArchiveEntry entry) {
+    public boolean removeFile(ArchiveFile target, ArchiveEntry entry) {
         try {
             ZipFile zipFile = new ZipFile(target.getFile());
             if (!entry.isDictionary()) {
                 FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
                 zipFile.removeFile(header);
-                return;
+                removeEntry(target.getRootEntry(),entry);
+                this.emit(new ViewRefreshEvent(entry,this));
+                return true;
             }
             List<ArchiveEntry> entries = entry.getChildren();
-            for (ArchiveEntry item: entries) {
+            for (int idx = 0; idx < entries.size(); idx ++ ){
+                ArchiveEntry item = entries.get(idx);
                 removeFile(target,item);
             }
-            FileHeader header = zipFile.getFileHeader(entry.getPath());
+            FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1) + "/");
             zipFile.removeFile(header);
+            removeEntry(target.getRootEntry(),entry);
+            this.emit(new ViewRefreshEvent(entry,this));
+            return true;
         } catch (Exception e) {
             logger.error("fail to remove file", e);
+            return false;
         }
     }
 

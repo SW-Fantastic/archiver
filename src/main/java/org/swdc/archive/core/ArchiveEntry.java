@@ -39,6 +39,8 @@ public class ArchiveEntry {
     @Setter
     private List<ArchiveEntry> children = new ArrayList<>();
 
+    private TreeItem<ArchiveEntry> treeItem;
+
     public String getFileSize() {
         if (getSize() == null) {
             return "";
@@ -66,29 +68,31 @@ public class ArchiveEntry {
     }
 
     public TreeItem<ArchiveEntry> toTreeItem(AppComponent component) {
-        TreeItem<ArchiveEntry> root = new TreeItem();
-        Label icon = new Label();
-        FontawsomeService fontawsomeService = component.findComponent(FontawsomeService.class);
-        icon.setFont(fontawsomeService.getFont(FontSize.SMALL));
-        icon.setText(fontawsomeService.getFontIcon("folder"));
-        root.setValue(this);
-        root.setExpanded(false);
-        root.setGraphic(icon);
-        root.expandedProperty().addListener((observableValue, oldState, newState) -> {
-            if (newState != null && newState) {
-                icon.setText(fontawsomeService.getFontIcon("folder_open"));
-            } else {
-                icon.setText(fontawsomeService.getFontIcon("folder"));
-            }
-        });
-        if (this.isDictionary()) {
-            for (ArchiveEntry entry : this.getChildren()) {
-                if (entry.isDictionary()) {
-                    root.getChildren().add(entry.toTreeItem(component));
+        if (this.treeItem == null ){
+            this.treeItem = new TreeItem<>();
+            Label icon = new Label();
+            FontawsomeService fontawsomeService = component.findComponent(FontawsomeService.class);
+            icon.setFont(fontawsomeService.getFont(FontSize.SMALL));
+            icon.setText(fontawsomeService.getFontIcon("folder"));
+            treeItem.setValue(this);
+            treeItem.setExpanded(false);
+            treeItem.setGraphic(icon);
+            treeItem.expandedProperty().addListener((observableValue, oldState, newState) -> {
+                if (newState != null && newState) {
+                    icon.setText(fontawsomeService.getFontIcon("folder_open"));
+                } else {
+                    icon.setText(fontawsomeService.getFontIcon("folder"));
+                }
+            });
+            if (this.isDictionary()) {
+                for (ArchiveEntry entry : this.getChildren()) {
+                    if (entry.isDictionary()) {
+                        treeItem.getChildren().add(entry.toTreeItem(component));
+                    }
                 }
             }
         }
-        return root;
+        return treeItem;
     }
 
     public String getPath() {

@@ -1,7 +1,7 @@
 package org.swdc.archive.ui.controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.shape.Arc;
+import javafx.scene.control.TreeItem;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
@@ -28,7 +28,14 @@ public class MainController extends FXController {
         }
         Class resolverClass = file.processor();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
-        resolver.removeFile(file,selected);
+        if (resolver.removeFile(file,selected)){
+            if (selected.isDictionary()) {
+                TreeItem<ArchiveEntry> parentItem = selected.getParent().toTreeItem(this);
+                parentItem.getChildren().remove(selected.toTreeItem(this));
+                parentItem.getValue().getChildren().remove(selected);
+            }
+
+        }
     }
 
 }

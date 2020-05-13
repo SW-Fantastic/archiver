@@ -12,4 +12,6 @@ public interface ArchiveFile {
 
     Class<? extends ArchiveProcessor> processor();
 
+    boolean isEncrypted();
+
 }

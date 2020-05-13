@@ -2,12 +2,14 @@ package org.swdc.archive.ui.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
+import javafx.stage.FileChooser;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.ui.view.MainView;
 import org.swdc.fx.FXController;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -34,8 +36,25 @@ public class MainController extends FXController {
                 parentItem.getChildren().remove(selected.toTreeItem(this));
                 parentItem.getValue().getChildren().remove(selected);
             }
-
         }
+    }
+
+    @FXML
+    public void addFile() {
+        MainView view = getView();
+        if (view.getArchiveFile() == null) {
+            return;
+        }
+        ArchiveFile archiveFile = view.getArchiveFile();
+        Class resolverClass = archiveFile.processor();
+        ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("添加");
+        File file = chooser.showOpenDialog(view.getStage());
+        if (file == null) {
+            return;
+        }
+        resolver.addFile(archiveFile,view.getSelectedEntry(),file);
     }
 
 }

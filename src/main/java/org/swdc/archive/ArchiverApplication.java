@@ -1,5 +1,6 @@
 package org.swdc.archive;
 
+import javafx.application.Platform;
 import org.swdc.archive.config.AppConfig;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;

@@ -3,6 +3,7 @@ package org.swdc.archive.ui.view;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeView;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.ui.controller.ArchiveViewController;
@@ -36,7 +37,12 @@ public class ArchiveView extends FXView {
 
     public ArchiveEntry getSelectedEntry() {
         TableView<ArchiveEntry> view = this.findById("archiveTable");
-        return view.getSelectionModel().getSelectedItem();
+        ArchiveEntry entry = view.getSelectionModel().getSelectedItem();
+        if (entry == null) {
+            TreeView<ArchiveEntry> archiveTree = this.findById("archiveTree");
+            entry = archiveTree.getSelectionModel().getSelectedItem().getValue();
+        }
+        return entry;
     }
 
 }

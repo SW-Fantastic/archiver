@@ -11,7 +11,7 @@
    <center>
       <SplitPane dividerPositions="0.3090128755364807" prefHeight="436.0" prefWidth="628.0" BorderPane.alignment="CENTER">
          <items>
-            <TreeView fx:id="archiveTree" minWidth="230.0" prefHeight="200.0" prefWidth="200.0" />
+            <TreeView id="archiveTree" fx:id="archiveTree" minWidth="230.0" prefHeight="200.0" prefWidth="200.0" />
             <TableView id="archiveTable" fx:id="contentTable" prefHeight="200.0" prefWidth="200.0">
               <columns>
                   <TableColumn fx:id="iconColumn" editable="false" prefWidth="47.0" resizable="false" sortable="false" />

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="82.0" prefWidth="425.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <ProgressBar id="progress" prefHeight="28.0" prefWidth="377.0" progress="0.0" />
+         </children>
+      </HBox>
+   </center>
+   <top>
+      <HBox alignment="BOTTOM_LEFT" prefHeight="31.0" prefWidth="425.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label id="message" text="Please wait.">
+               <HBox.margin>
+                  <Insets left="24.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+   </top>
+</BorderPane>

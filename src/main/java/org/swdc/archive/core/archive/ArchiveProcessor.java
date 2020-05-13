@@ -8,7 +8,7 @@ import java.io.File;
 
 public interface ArchiveProcessor {
 
-    void addFile(ArchiveFile target, File file);
+    void addFile(ArchiveFile target,ArchiveEntry entry, File file);
 
     boolean removeFile(ArchiveFile target, ArchiveEntry entry);
 

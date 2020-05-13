@@ -1,17 +1,29 @@
 package org.swdc.archive.core.archive.zip;
 
+import javafx.application.Platform;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.ZipParameters;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
+import org.swdc.archive.ui.view.ProgressView;
 
 import java.io.File;
 import java.util.Date;
 import java.util.List;
 
 public class ZipArchiveResolver extends ArchiveResolver {
+
+    private ProgressView progressView = null;
+
+    @Override
+    public void initialize() {
+        Platform.runLater(() -> {
+            this.progressView = findView(ProgressView.class);
+        });
+    }
 
     @Override
     public ArchiveFile loadFile(File file) {
@@ -66,8 +78,32 @@ public class ZipArchiveResolver extends ArchiveResolver {
     }
 
     @Override
-    public void addFile(ArchiveFile target, File file) {
-
+    public void addFile(ArchiveFile target,ArchiveEntry entry, File file) {
+        ZipFile zipFile = new ZipFile(target.getFile());
+        if (!entry.isDictionary()) {
+            entry = entry.getParent();
+        }
+        String parent = entry.getPath();
+        String name = parent + "/" + file.getName();
+        while (name.startsWith("/")) {
+            name = name.substring(1);
+        }
+        ZipParameters parameters = new ZipParameters();
+        parameters.setFileNameInZip(name);
+        parameters.setOverrideExistingFilesInZip(true);
+        try {
+            zipFile.addFile(file,parameters);
+            ArchiveEntry created = new ArchiveEntry();
+            created.setFileName(file.getName());
+            created.setParent(entry);
+            created.setLastModifiedDate(new Date());
+            created.setSize(file.length());
+            created.setDictionary(false);
+            entry.getChildren().add(created);
+            this.emit(new ViewRefreshEvent(created,this));
+        } catch (Exception e) {
+            logger.error("fail to add file");
+        }
     }
 
     @Override
@@ -80,11 +116,6 @@ public class ZipArchiveResolver extends ArchiveResolver {
                 removeEntry(target.getRootEntry(),entry);
                 this.emit(new ViewRefreshEvent(entry,this));
                 return true;
-            }
-            List<ArchiveEntry> entries = entry.getChildren();
-            for (int idx = 0; idx < entries.size(); idx ++ ){
-                ArchiveEntry item = entries.get(idx);
-                removeFile(target,item);
             }
             FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1) + "/");
             zipFile.removeFile(header);

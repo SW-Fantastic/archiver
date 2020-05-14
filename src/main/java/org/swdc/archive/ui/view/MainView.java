@@ -3,6 +3,7 @@ package org.swdc.archive.ui.view;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
@@ -40,7 +41,12 @@ public class MainView extends FXView {
     public void initialize() {
         this.configButtonIcon("addFile", "plus","向当前位置添加文件");
         this.configButtonIcon("removeFile","trash", "移除此处的文件");
-        this.configButtonIcon("unArchive", "tasks", "解压当前文件");
+
+        MenuButton unArchive = findById("unarchivedp");
+        unArchive.setPadding(new Insets(4,4,4,4));
+        unArchive.setFont(fontawsomeService.getFont(FontSize.MIDDLE));
+        unArchive.setText(fontawsomeService.getFontIcon("tasks"));
+        unArchive.setTooltip(new Tooltip("全部解压"));
 
         Stage stage = getStage();
         stage.setMinWidth(800);

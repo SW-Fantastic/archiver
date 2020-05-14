@@ -2,6 +2,7 @@ package org.swdc.archive.ui.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
@@ -55,6 +56,21 @@ public class MainController extends FXController {
             return;
         }
         resolver.addFile(archiveFile,view.getSelectedEntry(),file);
+    }
+
+    @FXML
+    public void extractAll() {
+        MainView view = getView();
+        if (view.getArchiveFile() == null){
+            return;
+        }
+        ArchiveFile file = view.getArchiveFile();
+        Class resolverClass = file.processor();
+        ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("解压到");
+        File target = directoryChooser.showDialog(view.getStage());
+        resolver.extractFiles(file,target);
     }
 
 }

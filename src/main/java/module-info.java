@@ -11,6 +11,7 @@ module fxArchive {
     requires org.apache.commons.compress;
 
     requires zip4j;
+    requires cpdetector;
 
     opens org.swdc.archive.ui.view to
             javafx.fxml,

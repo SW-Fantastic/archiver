@@ -1,3 +1,6 @@
+.dialog-pane {
+  -fx-background-color: #fffcf2;
+}
 .scene {
   -fx-background-size: cover;
   -fx-font-family: "Noto Sans CJK DemiLight";
@@ -17,8 +20,43 @@
   -fx-border-color: #74a982;
   -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
 }
+.scene .tool-bar .menu-button {
+  -fx-border-width: 1px;
+  -fx-border-color: rgba(255, 255, 255, 0);
+}
+.scene .tool-bar .menu-button > .label,
+.scene .tool-bar .menu-button .arrow,
+.scene .tool-bar .menu-button {
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-text-fill: #74a982;
+}
+.scene .tool-bar .menu-button:hover {
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .tool-bar .menu-button .menu-item {
+  -fx-font-size: 13;
+  -fx-accent: #74a982;
+}
+.scene .tool-bar .menu-button .menu-item:selected .label,
+.scene .tool-bar .menu-button .menu-item:hover .label,
+.scene .tool-bar .menu-button .menu-item:focused .label {
+  -fx-text-fill: #FFF;
+}
 .scene .tool-bar .tooltip {
   -fx-font-size: 14;
+}
+.scene .progress-bar .track {
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-border-color: #55917f;
+  -fx-border-width: 1px;
+  -fx-border-style: dashed;
+  -fx-border-radius: 8;
+  -fx-background-radius: 8;
+}
+.scene .progress-bar .bar {
+  -fx-background-color: #74a982;
+  -fx-border-radius: 8;
+  -fx-background-radius: 8;
 }
 .scene .scroll-bar {
   -fx-background-color: rgba(255, 255, 255, 0);

@@ -13,6 +13,24 @@
   }
 
 }
+.btn-menu-without-bg(@fontcolor) {
+  -fx-border-width: 1px;
+  -fx-border-color: @color-noting;
+  & > .label, & .arrow, &{
+    -fx-background-color: @color-noting;
+    -fx-text-fill: @fontcolor;
+  }
+  &:hover {
+    -fx-effect: dropshadow(three-pass-box,@fontcolor, 8, 0, 0, 0);
+  }
+  .menu-item {
+    -fx-font-size: 13;
+    -fx-accent: @fontcolor;
+    &:selected .label,&:hover .label, &:focused .label{
+      -fx-text-fill: #FFF;
+    }
+  }
+}
 
 .btn-blocked(@background, @text) {
   -fx-background-color: @background;

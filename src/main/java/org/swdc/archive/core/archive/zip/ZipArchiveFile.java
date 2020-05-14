@@ -6,6 +6,7 @@ import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveProcessor;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 public class ZipArchiveFile implements ArchiveFile {
 
@@ -13,8 +14,14 @@ public class ZipArchiveFile implements ArchiveFile {
 
     private ArchiveEntry root= null;
 
+    private Charset charset = Charset.defaultCharset();
+
     public ZipArchiveFile(File file) {
         this.file = file;
+    }
+
+    public void setCharset(Charset charset) {
+        this.charset = charset;
     }
 
     @Override
@@ -24,6 +31,11 @@ public class ZipArchiveFile implements ArchiveFile {
 
     public void setRoot(ArchiveEntry root) {
         this.root = root;
+    }
+
+    @Override
+    public Charset getCharset() {
+        return charset;
     }
 
     @Override

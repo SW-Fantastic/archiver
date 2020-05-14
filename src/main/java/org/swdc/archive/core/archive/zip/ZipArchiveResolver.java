@@ -4,13 +4,16 @@ import javafx.application.Platform;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.progress.ProgressMonitor;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.ui.DataUtil;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.ProgressView;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 
@@ -28,8 +31,12 @@ public class ZipArchiveResolver extends ArchiveResolver {
     @Override
     public ArchiveFile loadFile(File file) {
         try {
+            Charset charset =  DataUtil.getCharset(file);
             ZipArchiveFile zipArchiveFile = new ZipArchiveFile(file);
+            zipArchiveFile.setCharset(charset);
+
             ZipFile zipFile = new ZipFile(file);
+            zipFile.setCharset(charset);
             ArchiveEntry rootEntry = new ArchiveEntry();
             rootEntry.setFileName("/");
             rootEntry.setDictionary(true);
@@ -154,6 +161,36 @@ public class ZipArchiveResolver extends ArchiveResolver {
             logger.error("fail to move archive entry ",e);
         }
 
+    }
+
+    @Override
+    public void extractFile(ArchiveFile file, ArchiveEntry entry, File target) {
+
+    }
+
+    @Override
+    public void extractFiles(ArchiveFile file, File target) {
+        ZipFile zipFile = new ZipFile(file.getFile());
+        try {
+            progressView.show();
+            ProgressMonitor monitor = zipFile.getProgressMonitor();
+            Thread prog = new Thread(() -> {
+                try {
+                    while (monitor.getPercentDone() < 100) {
+                        Thread.sleep(500);
+                        String name = monitor.getFileName();
+                        progressView.update("正在解压文件: " + name, monitor.getPercentDone() / 100.0);
+                    }
+                    progressView.finish();
+                } catch (Exception ignore) {
+                }
+            });
+            prog.start();
+            zipFile.setRunInThread(true);
+            zipFile.extractAll(target.getAbsolutePath());
+        } catch (Exception e) {
+            logger.error("fail to extract files",e);
+        }
     }
 
     @Override

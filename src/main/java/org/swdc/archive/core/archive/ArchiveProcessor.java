@@ -16,6 +16,10 @@ public interface ArchiveProcessor {
 
     void moveFile(ArchiveFile file, ArchiveEntry form, ArchiveEntry target);
 
+    void extractFile(ArchiveFile file, ArchiveEntry entry, File target);
+
+    void extractFiles(ArchiveFile file, File target);
+
     String getName();
 
     String getExtension();

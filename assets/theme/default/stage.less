@@ -6,6 +6,10 @@
 @color-text:#55917F;
 @color-background:#FFFCF2;
 
+.dialog-pane{
+  -fx-background-color: @color-background;
+}
+
 .scene {
   -fx-background-size: cover;
   -fx-font-family: "Noto Sans CJK DemiLight";
@@ -14,8 +18,26 @@
     .button {
       .btn-without-background(@color-dark-green)
     }
+    .menu-button {
+      .btn-menu-without-bg(@color-dark-green)
+    }
     .tooltip {
       -fx-font-size: 14;
+    }
+  }
+  .progress-bar {
+    .track {
+      -fx-background-color: @color-noting;
+      -fx-border-color: @color-text;
+      -fx-border-width: 1px;
+      -fx-border-style: dashed;
+      -fx-border-radius: 8;
+      -fx-background-radius: 8;
+    }
+    .bar {
+      -fx-background-color: @color-dark-green;
+      -fx-border-radius: 8;
+      -fx-background-radius: 8;
     }
   }
   .scroll-bar {

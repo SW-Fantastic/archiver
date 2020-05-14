@@ -15,7 +15,12 @@
         <items>
           <Button id="addFile" mnemonicParsing="false" onAction="#addFile" prefHeight="48.0" prefWidth="48.0" text="add" />
             <Button id="removeFile" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" onAction="#removeFile" prefHeight="48.0" prefWidth="48.0" text="delete" />
-            <Button id="unArchive" layoutX="62.0" layoutY="13.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="unarchive" />
+            <MenuButton id="unarchivedp" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="MenuButton">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#extractAll" text="全部解压" />
+                <MenuItem mnemonicParsing="false" text="解压选择的文件" />
+              </items>
+            </MenuButton>
         </items>
       </ToolBar>
    </top>

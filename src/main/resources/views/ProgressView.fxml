@@ -26,4 +26,8 @@
          </children>
       </HBox>
    </top>
+   <styleClass>
+      <String fx:value="scene" />
+      <String fx:value="dialog-pane" />
+   </styleClass>
 </BorderPane>

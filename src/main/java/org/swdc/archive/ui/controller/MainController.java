@@ -73,4 +73,23 @@ public class MainController extends FXController {
         resolver.extractFiles(file,target);
     }
 
+    @FXML
+    public void extractSelected() {
+        MainView view = getView();
+        if (view.getArchiveFile() == null){
+            return;
+        }
+        ArchiveEntry selected = view.getSelectedEntry();
+        ArchiveFile file = view.getArchiveFile();
+        Class resolverClass = file.processor();
+        ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("解压到");
+        File target = directoryChooser.showDialog(view.getStage());
+        if (target == null) {
+            return;
+        }
+        resolver.extractFile(file,selected,target);
+    }
+
 }

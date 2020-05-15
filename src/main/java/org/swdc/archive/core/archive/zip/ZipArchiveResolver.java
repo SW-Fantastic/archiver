@@ -14,8 +14,7 @@ import org.swdc.archive.ui.view.ProgressView;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class ZipArchiveResolver extends ArchiveResolver {
 
@@ -53,6 +52,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
         }
     }
 
+
     private ArchiveEntry resolveEntry(ArchiveEntry root, FileHeader archiveEntry){
         String fullPath = archiveEntry.getFileName();
         String[] paths = fullPath.split("/");
@@ -87,6 +87,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
     @Override
     public void addFile(ArchiveFile target,ArchiveEntry entry, File file) {
         ZipFile zipFile = new ZipFile(target.getFile());
+        zipFile.setCharset(target.getCharset());
         if (!entry.isDictionary()) {
             entry = entry.getParent();
         }
@@ -117,6 +118,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
     public boolean removeFile(ArchiveFile target, ArchiveEntry entry) {
         try {
             ZipFile zipFile = new ZipFile(target.getFile());
+            zipFile.setCharset(target.getCharset());
             if (!entry.isDictionary()) {
                 FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
                 zipFile.removeFile(header);
@@ -146,6 +148,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             return;
         }
         ZipFile zipFile = new ZipFile(file.getFile());
+        zipFile.setCharset(file.getCharset());
         try {
             if (!form.isDictionary()) {
                 FileHeader header = zipFile.getFileHeader(form.getPath());
@@ -165,12 +168,40 @@ public class ZipArchiveResolver extends ArchiveResolver {
 
     @Override
     public void extractFile(ArchiveFile file, ArchiveEntry entry, File target) {
+        try {
+            ZipFile zipFile = new ZipFile(file.getFile());
+            zipFile.setCharset(file.getCharset());
+            ProgressMonitor monitor = zipFile.getProgressMonitor();
+            progressView.show();
+            Thread proc = new Thread(() -> {
+                try {
+                    while (monitor.getPercentDone() < 100) {
+                        Thread.sleep(500);
+                        String name = monitor.getFileName();
+                        progressView.update("正在解压文件: " + name, monitor.getPercentDone() / 100.0);
+                    }
+                    progressView.finish();
+                } catch (Exception ignore) {
+                }
+            });
 
+            FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
+            if (header == null){
+                progressView.finish();
+                return;
+            }
+            proc.start();
+            zipFile.setRunInThread(true);
+            zipFile.extractFile(header,target.getAbsolutePath());
+        } catch (Exception e){
+            logger.error("fail to extract file: ",e);
+        }
     }
 
     @Override
     public void extractFiles(ArchiveFile file, File target) {
         ZipFile zipFile = new ZipFile(file.getFile());
+        zipFile.setCharset(file.getCharset());
         try {
             progressView.show();
             ProgressMonitor monitor = zipFile.getProgressMonitor();

@@ -18,7 +18,7 @@
             <MenuButton id="unarchivedp" mnemonicParsing="false" prefHeight="48.0" prefWidth="48.0" text="MenuButton">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#extractAll" text="全部解压" />
-                <MenuItem mnemonicParsing="false" text="解压选择的文件" />
+                <MenuItem mnemonicParsing="false" onAction="#extractSelected" text="解压选择的文件" />
               </items>
             </MenuButton>
         </items>

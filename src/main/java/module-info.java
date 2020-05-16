@@ -29,6 +29,7 @@ module fxArchive {
             fx.framework.core;
 
     opens org.swdc.archive.core to
+            fx.framework.core,
             javafx.base;
 
     opens org.swdc.archive.core.archive.zip to

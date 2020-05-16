@@ -17,7 +17,6 @@
   -fx-border-radius: 6px;
 }
 .scene .tool-bar .button:hover {
-  -fx-border-color: #74a982;
   -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
 }
 .scene .tool-bar .menu-button {
@@ -58,6 +57,14 @@
   -fx-border-radius: 8;
   -fx-background-radius: 8;
 }
+.scene .context-menu .menu-item {
+  -fx-accent: #74a982;
+}
+.scene .context-menu .menu-item:hover .label,
+.scene .context-menu .menu-item:focused .label,
+.scene .context-menu .menu-item:selected .label {
+  -fx-text-fill: #fffcf2;
+}
 .scene .scroll-bar {
   -fx-background-color: rgba(255, 255, 255, 0);
   -fx-font-size: 8;
@@ -77,6 +84,7 @@
 .scene .content-view {
   -fx-background-color: rgba(255, 255, 255, 0.6);
   -fx-background-radius: 12;
+  -fx-font-size: 13;
 }
 .scene .content-view .btn-block {
   -fx-background-color: #74a982;
@@ -97,7 +105,6 @@
   -fx-border-radius: 6px;
 }
 .scene .content-view .btn-no-bg:hover {
-  -fx-border-color: #74a982;
   -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
 }
 .scene .content-view .text-field {

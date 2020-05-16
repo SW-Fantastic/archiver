@@ -36,13 +36,16 @@ public class ZipArchiveResolver extends ArchiveResolver {
 
             ZipFile zipFile = new ZipFile(file);
             zipFile.setCharset(charset);
+            if (!zipFile.isValidZipFile()) {
+                return null;
+            }
             ArchiveEntry rootEntry = new ArchiveEntry();
             rootEntry.setFileName("/");
             rootEntry.setDictionary(true);
 
             List<FileHeader> headers = zipFile.getFileHeaders();
             for (FileHeader header: headers) {
-                resolveEntry(rootEntry, header);
+                resolveEntry(zipArchiveFile, rootEntry, header);
             }
             zipArchiveFile.setRoot(rootEntry);
             return zipArchiveFile;
@@ -53,7 +56,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
     }
 
 
-    private ArchiveEntry resolveEntry(ArchiveEntry root, FileHeader archiveEntry){
+    private ArchiveEntry resolveEntry(ArchiveFile file,ArchiveEntry root, FileHeader archiveEntry){
         String fullPath = archiveEntry.getFileName();
         String[] paths = fullPath.split("/");
         ArchiveEntry parent = root;
@@ -73,6 +76,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
                     next.setDictionary(archiveEntry.isDirectory());
                 }
                 next.setParent(parent);
+                next.setFile(file);
                 parent.getChildren().add(next);
             }
             parent = next;
@@ -81,6 +85,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             parent.setSize(archiveEntry.getCompressedSize());
         }
         parent.setLastModifiedDate(new Date(archiveEntry.getLastModifiedTime()));
+        parent.setFile(file);
         return parent;
     }
 
@@ -184,15 +189,21 @@ public class ZipArchiveResolver extends ArchiveResolver {
                 } catch (Exception ignore) {
                 }
             });
-
-            FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
-            if (header == null){
-                progressView.finish();
+            if(!entry.isDictionary()) {
+                FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
+                if (header == null){
+                    progressView.finish();
+                    return;
+                }
+                proc.start();
+                zipFile.setRunInThread(true);
+                zipFile.extractFile(header,target.getAbsolutePath());
                 return;
             }
-            proc.start();
-            zipFile.setRunInThread(true);
-            zipFile.extractFile(header,target.getAbsolutePath());
+            List<ArchiveEntry> children = entry.getChildren();
+            for (ArchiveEntry item: children) {
+                this.extractFile(file,item,target);
+            }
         } catch (Exception e){
             logger.error("fail to extract file: ",e);
         }

@@ -39,6 +39,10 @@ public class ArchiveEntry {
     @Setter
     private List<ArchiveEntry> children = new ArrayList<>();
 
+    @Getter
+    @Setter
+    private ArchiveFile file;
+
     private TreeItem<ArchiveEntry> treeItem;
 
     public String getFileSize() {

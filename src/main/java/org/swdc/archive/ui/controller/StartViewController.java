@@ -30,17 +30,29 @@ public class StartViewController extends FXController {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("打开");
         chooser.getExtensionFilters().addAll(filters);
+
+        List<String> extensions = filters.stream()
+                .flatMap(item -> item.getExtensions().stream())
+                .collect(Collectors.toList());
+
+        FileChooser.ExtensionFilter allSupported = new FileChooser.ExtensionFilter("所有支持的格式", extensions.toArray(String[]::new));
+        chooser.getExtensionFilters().add(allSupported);
+        chooser.setSelectedExtensionFilter(allSupported);
+
         File archiveFile = chooser.showOpenDialog(null);
         if (archiveFile == null) {
             return;
         }
         ArchiveProcessor processor = processors.stream()
-                .filter(item -> item.getFilter().equals(chooser.getSelectedExtensionFilter()))
+                .filter(item -> archiveFile.getName().endsWith(item.getExtension()))
                 .findFirst().orElse(null);
         if (processor == null) {
             return;
         }
         ArchiveFile file = processor.loadFile(archiveFile);
+        if (file == null) {
+            return;
+        }
         MainView view = findExistedComponent(MainView.class, v->v.getArchiveFile() == null);
         if (view == null) {
             view = this.findView(MainView.class);

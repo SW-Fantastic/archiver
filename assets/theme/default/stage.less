@@ -40,6 +40,14 @@
       -fx-background-radius: 8;
     }
   }
+  .context-menu {
+    .menu-item{
+      -fx-accent: @color-dark-green;
+      &:hover .label,&:focused .label,&:selected .label {
+        -fx-text-fill: @color-background;
+      }
+    }
+  }
   .scroll-bar {
     .scrollable(@color-dark-green);
   }
@@ -49,6 +57,7 @@
   .content-view {
     -fx-background-color: rgba(255,255,255,0.6);
     -fx-background-radius: 12;
+    -fx-font-size: 13;
     .btn-block{
       .btn-blocked(@color-dark-green,@color-background);
     }

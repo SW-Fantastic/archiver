@@ -1,22 +1,27 @@
 package org.swdc.archive.ui.controller;
 
 import javafx.beans.Observable;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableObjectValue;
 import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
+import org.swdc.archive.core.ArchiveService;
+import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.cells.IconColumnCell;
 import org.swdc.archive.ui.view.cells.IconTableColumnCell;
 import org.swdc.fx.FXController;
+import org.swdc.fx.anno.Aware;
 import org.swdc.fx.anno.Listener;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +46,9 @@ public class ArchiveViewController extends FXController {
 
     @FXML
     private TextField txtPath;
+
+    @Aware
+    private ArchiveService archiveService = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -139,6 +147,57 @@ public class ArchiveViewController extends FXController {
         archiveTree.getSelectionModel().select(archiveTree.getRoot());
         contentTable.getItems().clear();
         contentTable.getItems().addAll(file.getRootEntry().getChildren());
+    }
+
+    public void addFile(ActionEvent event) {
+        TreeItem<ArchiveEntry> item = archiveTree.getSelectionModel().getSelectedItem();
+        ArchiveFile archiveFile = item.getValue().getFile();
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("添加");
+        File file = chooser.showOpenDialog(null);
+        if (file == null) {
+            return;
+        }
+        archiveService.addFile(archiveFile,item.getValue(),file);
+    }
+
+    public void deleteFile(ActionEvent event){
+        ArchiveEntry item = contentTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            return;
+        }
+        ArchiveFile archiveFile = item.getFile();
+        archiveService.removeFile(archiveFile,item);
+    }
+
+    public void extractAll(ActionEvent event) {
+        ArchiveEntry item = contentTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            item = archiveTree.getRoot().getValue();
+        }
+        ArchiveFile file = item.getFile();
+        if (file == null) {
+            return;
+        }
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("解压到");
+        File target = directoryChooser.showDialog(null);
+        archiveService.extractAll(file,target);
+    }
+
+    public void extractFile(ActionEvent event) {
+        ArchiveEntry item = contentTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            return;
+        }
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("解压到");
+        File target = directoryChooser.showDialog(null);
+        ArchiveFile archiveFile = item.getFile();
+        if (archiveFile == null) {
+            return;
+        }
+        archiveService.extract(archiveFile,item,target);
     }
 
 }

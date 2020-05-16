@@ -15,6 +15,7 @@ import org.swdc.fx.properties.ConfigManager;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @SFXApplication(splash = FXSplash.class, mainView = MainView.class,singleton = true)
 public class ArchiverApplication extends FXApplication {
@@ -49,11 +50,15 @@ public class ArchiverApplication extends FXApplication {
         if (resolver == null) {
             return;
         }
-        ArchiveFile archiveFile = resolver.loadFile(file);
-        if(archiveFile != null) {
-            view.setArchiveFile(archiveFile);
-            view.show();
-        }
+        MainView mainView = view;
+        ArchiveResolver archiveResolver = resolver;
+        CompletableFuture.supplyAsync(() -> archiveResolver.loadFile(file))
+                .whenComplete((archiveFile,e) -> {
+                    if(archiveFile != null) {
+                        mainView.setArchiveFile(archiveFile);
+                        mainView.show();
+                    }
+                });
     }
 
     @Override

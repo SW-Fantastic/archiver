@@ -7,7 +7,16 @@
 @color-background:#FFFCF2;
 
 .dialog-pane{
+  -fx-font-family: "Noto Sans CJK DemiLight";
   -fx-background-color: @color-background;
+  -fx-font-size: 13;
+  .button {
+    -fx-font-size: 14;
+    .btn-blocked(@color-dark-green, @color-background)
+  }
+  .text-field {
+    .text(@color-dark-green);
+  }
 }
 
 .scene {

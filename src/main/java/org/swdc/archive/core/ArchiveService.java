@@ -16,6 +16,15 @@ public class ArchiveService extends Service {
         resolver.addFile(file,position,target);
     }
 
+    public void addFolder(ArchiveFile file, ArchiveEntry entry, File folder) {
+        Class resolverClass = file.processor();
+        ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
+        if (folder == null){
+            return;
+        }
+        resolver.addFolder(file,entry,folder);
+    }
+
     public void removeFile(ArchiveFile archiveFile, ArchiveEntry target) {
         if (archiveFile == null || target == null){
             return;

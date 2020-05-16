@@ -1,5 +1,6 @@
 package org.swdc.archive.ui.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.stage.FileChooser;
 import org.swdc.archive.core.ArchiveFile;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class StartViewController extends FXController {
@@ -49,15 +51,19 @@ public class StartViewController extends FXController {
         if (processor == null) {
             return;
         }
-        ArchiveFile file = processor.loadFile(archiveFile);
-        if (file == null) {
-            return;
-        }
-        MainView view = findExistedComponent(MainView.class, v->v.getArchiveFile() == null);
-        if (view == null) {
-            view = this.findView(MainView.class);
-        }
-        view.setArchiveFile(file);
-        view.show();
+        CompletableFuture.supplyAsync(() -> processor.loadFile(archiveFile))
+                .whenComplete((archive, e) -> {
+                    Platform.runLater(() -> {
+                        if (archive == null || e != null) {
+                            return;
+                        }
+                        MainView view = findExistedComponent(MainView.class, v->v.getArchiveFile() == null);
+                        if (view == null) {
+                            view = this.findView(MainView.class);
+                        }
+                        view.setArchiveFile(archive);
+                        view.show();
+                    });
+                });
     }
 }

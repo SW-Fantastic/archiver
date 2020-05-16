@@ -1,6 +1,7 @@
 package org.swdc.archive.core.archive.zip;
 
 import javafx.application.Platform;
+import javafx.scene.control.TreeItem;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
@@ -15,6 +16,7 @@ import org.swdc.archive.ui.view.ProgressView;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class ZipArchiveResolver extends ArchiveResolver {
 
@@ -30,24 +32,29 @@ public class ZipArchiveResolver extends ArchiveResolver {
     @Override
     public ArchiveFile loadFile(File file) {
         try {
+            progressView.show();
+            progressView.update("正在读取文件：" + file.getName(), 0);
             Charset charset =  DataUtil.getCharset(file);
+            progressView.update("读取文件编码格式：" + charset.name(),10);
             ZipArchiveFile zipArchiveFile = new ZipArchiveFile(file);
             zipArchiveFile.setCharset(charset);
 
             ZipFile zipFile = new ZipFile(file);
             zipFile.setCharset(charset);
+            progressView.update("验证压缩文件：" + file.getName(), 20);
             if (!zipFile.isValidZipFile()) {
                 return null;
             }
             ArchiveEntry rootEntry = new ArchiveEntry();
             rootEntry.setFileName("/");
             rootEntry.setDictionary(true);
-
+            progressView.update("读取内容",60);
             List<FileHeader> headers = zipFile.getFileHeaders();
             for (FileHeader header: headers) {
                 resolveEntry(zipArchiveFile, rootEntry, header);
             }
             zipArchiveFile.setRoot(rootEntry);
+            progressView.finish();
             return zipArchiveFile;
         } catch (Exception e){
             logger.error("fail to load ZipFile: ",e);
@@ -60,8 +67,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
         String fullPath = archiveEntry.getFileName();
         String[] paths = fullPath.split("/");
         ArchiveEntry parent = root;
-        int count = archiveEntry.isDirectory() ? 2: 1;
-        for (int idx = 0; idx <= paths.length - count; idx ++) {
+        for (int idx = 0; idx <= paths.length - 1; idx ++) {
             String current = paths[idx];
             ArchiveEntry next = parent.getChildren().stream()
                     .filter(item -> item.getFileName().equalsIgnoreCase(current))
@@ -70,7 +76,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             if (next == null) {
                 next = new ArchiveEntry();
                 next.setFileName(current);
-                if (idx + count < paths.length) {
+                if (idx + 1 < paths.length) {
                     next.setDictionary(true);
                 } else {
                     next.setDictionary(archiveEntry.isDirectory());
@@ -87,6 +93,45 @@ public class ZipArchiveResolver extends ArchiveResolver {
         parent.setLastModifiedDate(new Date(archiveEntry.getLastModifiedTime()));
         parent.setFile(file);
         return parent;
+    }
+
+    @Override
+    public void addFolder(ArchiveFile target, ArchiveEntry position, File folder) {
+        ZipFile zipFile = new ZipFile(target.getFile());
+        zipFile.setCharset(target.getCharset());
+        if (folder == null) {
+            return;
+        }
+        if (position == null) {
+            position = target.getRootEntry();
+        }
+        if (!position.isDictionary()) {
+            position = position.getParent();
+        }
+        try {
+            ZipParameters parameters = new ZipParameters();
+            String path = position.getPath().substring(1);
+            parameters.setRootFolderNameInZip(path);
+            ProgressMonitor monitor = zipFile.getProgressMonitor();
+            Thread progressor = getProgressThread("正在添加", monitor, (rst) -> {
+                try {
+                    List<FileHeader> headers = zipFile.getFileHeaders();
+                    for (FileHeader header: headers) {
+                        ArchiveEntry entry = resolveEntry(target, target.getRootEntry(), header);
+                        mountArchiveEntry(entry);
+                    }
+                    this.emit(new ViewRefreshEvent(null,this));
+                } catch (Exception e) {
+                    logger.error("fail to reload file tree");
+                }
+            });
+            progressView.show();
+            progressor.start();
+            zipFile.setRunInThread(true);
+            zipFile.addFolder(folder,parameters);
+        } catch (Exception e) {
+            logger.error("fail to add folder", e);
+        }
     }
 
     @Override
@@ -178,17 +223,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             zipFile.setCharset(file.getCharset());
             ProgressMonitor monitor = zipFile.getProgressMonitor();
             progressView.show();
-            Thread proc = new Thread(() -> {
-                try {
-                    while (monitor.getPercentDone() < 100) {
-                        Thread.sleep(500);
-                        String name = monitor.getFileName();
-                        progressView.update("正在解压文件: " + name, monitor.getPercentDone() / 100.0);
-                    }
-                    progressView.finish();
-                } catch (Exception ignore) {
-                }
-            });
+            Thread proc = getProgressThread("正在解压文件",monitor,null);
             if(!entry.isDictionary()) {
                 FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
                 if (header == null){
@@ -216,23 +251,30 @@ public class ZipArchiveResolver extends ArchiveResolver {
         try {
             progressView.show();
             ProgressMonitor monitor = zipFile.getProgressMonitor();
-            Thread prog = new Thread(() -> {
-                try {
-                    while (monitor.getPercentDone() < 100) {
-                        Thread.sleep(500);
-                        String name = monitor.getFileName();
-                        progressView.update("正在解压文件: " + name, monitor.getPercentDone() / 100.0);
-                    }
-                    progressView.finish();
-                } catch (Exception ignore) {
-                }
-            });
+            Thread prog = getProgressThread("正在解压", monitor,null);
             prog.start();
             zipFile.setRunInThread(true);
             zipFile.extractAll(target.getAbsolutePath());
         } catch (Exception e) {
             logger.error("fail to extract files",e);
         }
+    }
+
+    private Thread getProgressThread(String message, ProgressMonitor monitor, Consumer<Void> next) {
+        return new Thread(() -> {
+            try {
+                while (monitor.getPercentDone() < 100) {
+                    Thread.sleep(500);
+                    String name = monitor.getFileName();
+                    progressView.update(message + " : " + name, monitor.getPercentDone() / 100.0);
+                }
+                progressView.finish();
+                if (next != null) {
+                    next.accept(null);
+                }
+            } catch (Exception ignore) {
+            }
+        });
     }
 
     @Override

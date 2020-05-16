@@ -2,6 +2,7 @@ package org.swdc.archive.core.archive;
 
 import javafx.stage.FileChooser;
 import org.swdc.archive.core.ArchiveEntry;
+import org.swdc.archive.core.ArchiveFile;
 import org.swdc.fx.AppComponent;
 
 public abstract class ArchiveResolver extends AppComponent implements ArchiveProcessor {
@@ -29,6 +30,19 @@ public abstract class ArchiveResolver extends AppComponent implements ArchivePro
                 continue;
             }
             removeEntry(item,entry);
+        }
+    }
+
+    public void mountArchiveEntry(ArchiveEntry entry) {
+        if (!entry.isDictionary() || entry.hasTreeNode()) {
+            return;
+        }
+        ArchiveEntry parentItem = entry.getParent();
+        if (!parentItem.hasTreeNode()) {
+            mountArchiveEntry(parentItem);
+        }
+        if (!entry.hasTreeNode() && entry.isDictionary()) {
+            parentItem.toTreeItem(this).getChildren().add(entry.toTreeItem(this));
         }
     }
 

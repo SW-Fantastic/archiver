@@ -12,7 +12,7 @@ public class DataUtil {
     public static Charset getCharset(File file) {
         CodepageDetectorProxy detectorProxy = getCodePageDetector();
         try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file))) {
-            return detectorProxy.detectCodepage(bufferedInputStream, 1024);
+            return detectorProxy.detectCodepage(bufferedInputStream, 512);
         } catch (Exception e) {
             return Charset.defaultCharset();
         }

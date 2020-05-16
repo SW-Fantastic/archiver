@@ -112,6 +112,10 @@ public class ArchiveEntry {
         return stringBuilder.toString();
     }
 
+    public boolean hasTreeNode() {
+        return this.treeItem != null;
+    }
+
     @Override
     public String toString() {
         return getFileName();

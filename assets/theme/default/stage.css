@@ -1,5 +1,25 @@
 .dialog-pane {
+  -fx-font-family: "Noto Sans CJK DemiLight";
   -fx-background-color: #fffcf2;
+  -fx-font-size: 13;
+}
+.dialog-pane .button {
+  -fx-font-size: 14;
+  -fx-background-color: #74a982;
+  -fx-text-fill: #fffcf2;
+  -fx-border-width: 1px;
+  -fx-border-color: rgba(255, 255, 255, 0);
+  -fx-background-radius: 8;
+}
+.dialog-pane .button:hover {
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.dialog-pane .text-field {
+  -fx-background-color: rgba(255, 255, 255, 0.6);
+  -fx-border-width: 0 0 2 0;
+  -fx-border-color: #74a982;
+  -fx-border-style: solid;
+  -fx-text-fill: #74a982;
 }
 .scene {
   -fx-background-size: cover;

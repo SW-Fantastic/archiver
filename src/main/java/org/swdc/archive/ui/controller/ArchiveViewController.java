@@ -13,7 +13,6 @@ import javafx.stage.FileChooser;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.ArchiveService;
-import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.cells.IconColumnCell;
 import org.swdc.archive.ui.view.cells.IconTableColumnCell;
@@ -198,6 +197,25 @@ public class ArchiveViewController extends FXController {
             return;
         }
         archiveService.extract(archiveFile,item,target);
+    }
+
+    public void addFolder(ActionEvent e) {
+        ArchiveEntry item = contentTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            item = archiveTree.getRoot().getValue();
+        }
+        ArchiveFile file = item.getFile();
+        if (file == null) {
+            return;
+        }
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("添加文件夹");
+        File target = directoryChooser.showDialog(null);
+        ArchiveFile archiveFile = item.getFile();
+        if (archiveFile == null) {
+            return;
+        }
+        archiveService.addFolder(archiveFile,item,target);
     }
 
 }

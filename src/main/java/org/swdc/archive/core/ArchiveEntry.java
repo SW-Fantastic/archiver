@@ -43,6 +43,13 @@ public class ArchiveEntry {
     @Setter
     private ArchiveFile file;
 
+    @Setter
+    private Object externalData;
+
+    public <T> T getExternalData() {
+        return (T)externalData;
+    }
+
     private TreeItem<ArchiveEntry> treeItem;
 
     public String getFileSize() {

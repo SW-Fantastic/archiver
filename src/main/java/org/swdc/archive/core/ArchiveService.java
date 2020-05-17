@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 public class ArchiveService extends Service {
 
     public void addFile(ArchiveFile file,ArchiveEntry position, File target) {
-        Class resolverClass = file.processor();
+        Class resolverClass = file.getResolver();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
         if (target == null){
             return;
@@ -18,7 +18,7 @@ public class ArchiveService extends Service {
     }
 
     public void addFolder(ArchiveFile file, ArchiveEntry entry, File folder) {
-        Class resolverClass = file.processor();
+        Class resolverClass = file.getResolver();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
         if (folder == null){
             return;
@@ -30,7 +30,7 @@ public class ArchiveService extends Service {
         if (archiveFile == null || target == null){
             return;
         }
-        Class resolverClass = archiveFile.processor();
+        Class resolverClass = archiveFile.getResolver();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
         resolver.removeFile(archiveFile,target);
     }
@@ -39,7 +39,7 @@ public class ArchiveService extends Service {
         if (file == null || target == null) {
             return;
         }
-        Class resolverClass = file.processor();
+        Class resolverClass = file.getResolver();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
         resolver.extractFiles(file,target);
     }
@@ -48,7 +48,7 @@ public class ArchiveService extends Service {
         if (file == null || item == null || target == null) {
             return;
         }
-        Class resolverClass = file.processor();
+        Class resolverClass = file.getResolver();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
         CompletableFuture.runAsync(() -> resolver.extractFile(file,item,target));
     }
@@ -57,7 +57,7 @@ public class ArchiveService extends Service {
         if (file == null || name == null || name.isBlank() || target == null) {
             return;
         }
-        Class resolverClass = file.processor();
+        Class resolverClass = file.getResolver();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
         resolver.rename(file,target,name);
     }

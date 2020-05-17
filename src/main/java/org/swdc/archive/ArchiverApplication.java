@@ -1,8 +1,6 @@
 package org.swdc.archive;
 
-import javafx.application.Platform;
 import org.swdc.archive.config.AppConfig;
-import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.core.archive.ArchiveResolverManager;
 import org.swdc.archive.ui.view.MainView;
@@ -56,6 +54,7 @@ public class ArchiverApplication extends FXApplication {
                 .whenComplete((archiveFile,e) -> {
                     if(archiveFile != null) {
                         mainView.setArchiveFile(archiveFile);
+                        mainView.getStage().setTitle(archiveFile.getFile().getName() + " - 压缩管理");
                         mainView.show();
                     }
                 });

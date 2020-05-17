@@ -1,7 +1,6 @@
-package org.swdc.archive.core.archive.zip;
+package org.swdc.archive.core.archive.formats;
 
 import javafx.application.Platform;
-import javafx.scene.control.TreeItem;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
@@ -36,7 +35,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             progressView.update("正在读取文件：" + file.getName(), 0);
             Charset charset =  DataUtil.getCharset(file);
             progressView.update("读取文件编码格式：" + charset.name(),10);
-            ZipArchiveFile zipArchiveFile = new ZipArchiveFile(file);
+            ArchiveFile zipArchiveFile = new ArchiveFile(file);
             zipArchiveFile.setCharset(charset);
 
             ZipFile zipFile = new ZipFile(file);
@@ -55,6 +54,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
                 resolveEntry(zipArchiveFile, rootEntry, header);
             }
             zipArchiveFile.setRoot(rootEntry);
+            zipArchiveFile.setResolver(this.getClass());
             progressView.finish();
             return zipArchiveFile;
         } catch (Exception e){

@@ -8,9 +8,12 @@ module fxArchive {
     requires lombok;
     requires fx.framework.core;
     requires fx.framework.resource;
-    requires org.apache.commons.compress;
 
+    requires org.apache.commons.compress;
     requires zip4j;
+    requires org.tukaani.xz;
+    requires sevenzipjbinding;
+    requires sevenzipjbinding.all.platforms;
     requires cpdetector;
 
     opens org.swdc.archive.ui.view to
@@ -40,7 +43,7 @@ module fxArchive {
             fx.framework.core,
             javafx.base;
 
-    opens org.swdc.archive.core.archive.zip to
+    opens org.swdc.archive.core.archive.formats to
             fx.framework.core;
 
     opens org.swdc.archive.config to

@@ -61,6 +61,7 @@ public class StartViewController extends FXController {
                             view = this.findView(MainView.class);
                         }
                         view.setArchiveFile(archive);
+                        view.getStage().setTitle(archive.getFile().getName() + " - 压缩管理");
                         view.show();
                     });
                 });

@@ -1,10 +1,8 @@
 package org.swdc.archive.ui.view;
 
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import lombok.Getter;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.ui.UIUtil;

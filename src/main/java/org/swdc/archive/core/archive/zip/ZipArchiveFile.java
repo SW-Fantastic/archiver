@@ -3,7 +3,7 @@ package org.swdc.archive.core.archive.zip;
 import net.lingala.zip4j.ZipFile;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
-import org.swdc.archive.core.archive.ArchiveProcessor;
+import org.swdc.archive.core.archive.FileArchiver;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -44,7 +44,7 @@ public class ZipArchiveFile implements ArchiveFile {
     }
 
     @Override
-    public Class<? extends ArchiveProcessor> processor() {
+    public Class<? extends FileArchiver> processor() {
         return ZipArchiveResolver.class;
     }
 

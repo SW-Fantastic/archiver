@@ -2,10 +2,9 @@ package org.swdc.archive.core.archive;
 
 import javafx.stage.FileChooser;
 import org.swdc.archive.core.ArchiveEntry;
-import org.swdc.archive.core.ArchiveFile;
 import org.swdc.fx.AppComponent;
 
-public abstract class ArchiveResolver extends AppComponent implements ArchiveProcessor {
+public abstract class ArchiveResolver extends AppComponent implements FileArchiver {
 
     private FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(getName(), "*." + getExtension());
 

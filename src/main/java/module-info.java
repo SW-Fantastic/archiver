@@ -21,6 +21,14 @@ module fxArchive {
             javafx.fxml,
             fx.framework.core;
 
+    opens org.swdc.archive.ui.view.dialog to
+            javafx.fxml,
+            fx.framework.core;
+
+    opens org.swdc.archive.ui.controller.dialog to
+            javafx.fxml,
+            fx.framework.core;
+
     opens org.swdc.archive.ui.view.cells to
             javafx.fxml,
             fx.framework.core;

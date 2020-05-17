@@ -54,13 +54,15 @@ public class ArchiveView extends FXView {
         MenuItem extractSelect = UIUtil.createMenuItem("解压此文件", controller::extractFile);
         MenuItem delete = UIUtil.createMenuItem("删除文件", controller::deleteFile);
         MenuItem extractAll = UIUtil.createMenuItem("全部解压", controller::extractAll);
+        MenuItem rename = UIUtil.createMenuItem("重命名", controller::onRenameItem);
 
         extractSelect.disableProperty().bind(disabled);
         delete.disableProperty().bind(disabled);
+        rename.disableProperty().bind(disabled);
 
         this.tableContextMenu.getItems().addAll(addFile, addFolder,
                 new SeparatorMenuItem(),
-                extractSelect,extractAll,delete);
+                rename, extractSelect,extractAll,delete);
 
         archiveTable.setContextMenu(this.tableContextMenu);
     }

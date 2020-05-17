@@ -3,8 +3,7 @@ package org.swdc.archive.ui.controller;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.stage.FileChooser;
-import org.swdc.archive.core.ArchiveFile;
-import org.swdc.archive.core.archive.ArchiveProcessor;
+import org.swdc.archive.core.archive.FileArchiver;
 import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.ui.view.MainView;
 import org.swdc.fx.FXController;
@@ -45,7 +44,7 @@ public class StartViewController extends FXController {
         if (archiveFile == null) {
             return;
         }
-        ArchiveProcessor processor = processors.stream()
+        FileArchiver processor = processors.stream()
                 .filter(item -> archiveFile.getName().endsWith(item.getExtension()))
                 .findFirst().orElse(null);
         if (processor == null) {

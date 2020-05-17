@@ -72,7 +72,7 @@ public class ArchiveEntry {
     }
 
     public TreeItem<ArchiveEntry> toTreeItem(AppComponent component) {
-        if (this.treeItem == null ){
+        if (this.treeItem == null ) {
             this.treeItem = new TreeItem<>();
             Label icon = new Label();
             FontawsomeService fontawsomeService = component.findComponent(FontawsomeService.class);
@@ -104,10 +104,13 @@ public class ArchiveEntry {
         ArchiveEntry parent = this;
         while (parent != null) {
             stringBuilder.insert(0,parent.getFileName());
-            if (parent.getParent() != null && !parent.getParent().getFileName().equals("/")) {
+            if (parent.getParent() != null && !parent.getParent().equals(file.getRootEntry())) {
                 stringBuilder.insert(0, '/');
             }
             parent = parent.getParent();
+        }
+        if (this.isDictionary()) {
+            stringBuilder.append('/');
         }
         return stringBuilder.toString();
     }

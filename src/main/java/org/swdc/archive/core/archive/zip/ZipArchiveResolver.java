@@ -47,6 +47,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             }
             ArchiveEntry rootEntry = new ArchiveEntry();
             rootEntry.setFileName("/");
+            rootEntry.setFile(zipArchiveFile);
             rootEntry.setDictionary(true);
             progressView.update("读取内容",60);
             List<FileHeader> headers = zipFile.getFileHeaders();
@@ -110,7 +111,8 @@ public class ZipArchiveResolver extends ArchiveResolver {
         }
         try {
             ZipParameters parameters = new ZipParameters();
-            String path = position.getPath().substring(1);
+            String path = position.getPath();
+            path = path.substring(1, path.length() - 1);
             parameters.setRootFolderNameInZip(path);
             ProgressMonitor monitor = zipFile.getProgressMonitor();
             Thread progressor = getProgressThread("正在添加", monitor, (rst) -> {
@@ -142,12 +144,9 @@ public class ZipArchiveResolver extends ArchiveResolver {
             entry = entry.getParent();
         }
         String parent = entry.getPath();
-        String name = parent + "/" + file.getName();
-        while (name.startsWith("/")) {
-            name = name.substring(1);
-        }
+        String name = parent.substring(1);
         ZipParameters parameters = new ZipParameters();
-        parameters.setFileNameInZip(name);
+        parameters.setRootFolderNameInZip(name);
         parameters.setOverrideExistingFilesInZip(true);
         try {
             zipFile.addFile(file,parameters);
@@ -157,6 +156,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             created.setLastModifiedDate(new Date());
             created.setSize(file.length());
             created.setDictionary(false);
+            created.setFile(target);
             entry.getChildren().add(created);
             this.emit(new ViewRefreshEvent(created,this));
         } catch (Exception e) {
@@ -169,14 +169,10 @@ public class ZipArchiveResolver extends ArchiveResolver {
         try {
             ZipFile zipFile = new ZipFile(target.getFile());
             zipFile.setCharset(target.getCharset());
-            if (!entry.isDictionary()) {
-                FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
-                zipFile.removeFile(header);
-                removeEntry(target.getRootEntry(),entry);
-                this.emit(new ViewRefreshEvent(entry,this));
-                return true;
+            FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
+            if (header == null) {
+                return false;
             }
-            FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1) + "/");
             zipFile.removeFile(header);
             removeEntry(target.getRootEntry(),entry);
             this.emit(new ViewRefreshEvent(entry,this));
@@ -190,6 +186,25 @@ public class ZipArchiveResolver extends ArchiveResolver {
     @Override
     public void createArchive(File target) {
 
+    }
+
+    @Override
+    public void rename(ArchiveFile file, ArchiveEntry target, String newName) {
+        try {
+            ZipFile zipFile = new ZipFile(file.getFile());
+            zipFile.setCharset(file.getCharset());
+            String headerName = target.getPath().substring(1);
+            FileHeader header = zipFile.getFileHeader(headerName);
+            if (header == null) {
+                return;
+            }
+            String renamedPath = headerName.replace(target.getFileName(), newName);
+            zipFile.renameFile(header,renamedPath);
+            target.setFileName(newName);
+            this.emit(new ViewRefreshEvent(target,this));
+        } catch (Exception e) {
+            logger.error("fail to rename file or folder", e);
+        }
     }
 
     @Override
@@ -218,15 +233,21 @@ public class ZipArchiveResolver extends ArchiveResolver {
 
     @Override
     public void extractFile(ArchiveFile file, ArchiveEntry entry, File target) {
+        extractFileImpl(file,entry,target,false);
+    }
+
+    public void extractFileImpl(ArchiveFile file, ArchiveEntry entry, File target, boolean cascade) {
         try {
             ZipFile zipFile = new ZipFile(file.getFile());
             zipFile.setCharset(file.getCharset());
             ProgressMonitor monitor = zipFile.getProgressMonitor();
-            progressView.show();
+            if (!cascade) {
+                progressView.show();
+            }
             Thread proc = getProgressThread("正在解压文件",monitor,null);
             if(!entry.isDictionary()) {
                 FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
-                if (header == null){
+                if (header == null && !cascade){
                     progressView.finish();
                     return;
                 }
@@ -235,9 +256,14 @@ public class ZipArchiveResolver extends ArchiveResolver {
                 zipFile.extractFile(header,target.getAbsolutePath());
                 return;
             }
+            double prog;
+            int resolved = 0;
             List<ArchiveEntry> children = entry.getChildren();
             for (ArchiveEntry item: children) {
-                this.extractFile(file,item,target);
+                resolved ++;
+                prog = resolved + 0.0 / children.size();
+                progressView.update("正在解压：" + item.getFileName(), prog);
+                this.extractFileImpl(file,item,target,true);
             }
         } catch (Exception e){
             logger.error("fail to extract file: ",e);

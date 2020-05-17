@@ -1,5 +1,6 @@
 package org.swdc.archive.ui.controller;
 
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -16,6 +17,7 @@ import org.swdc.archive.core.ArchiveService;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.cells.IconColumnCell;
 import org.swdc.archive.ui.view.cells.IconTableColumnCell;
+import org.swdc.archive.ui.view.dialog.RenameView;
 import org.swdc.fx.FXController;
 import org.swdc.fx.anno.Aware;
 import org.swdc.fx.anno.Listener;
@@ -118,9 +120,11 @@ public class ArchiveViewController extends FXController {
 
     @Listener(ViewRefreshEvent.class)
     public void refreshTable(ViewRefreshEvent refreshEvent) {
-        ArchiveEntry item = archiveTree.getSelectionModel().getSelectedItem().getValue();
-        contentTable.getItems().clear();
-        contentTable.getItems().addAll(item.getChildren());
+        Platform.runLater(() ->{
+            ArchiveEntry item = archiveTree.getSelectionModel().getSelectedItem().getValue();
+            contentTable.getItems().clear();
+            contentTable.getItems().addAll(item.getChildren());
+        });
     }
 
     private void onTreeItemChange(Observable observable, TreeItem<ArchiveEntry> oldEntry, TreeItem<ArchiveEntry> newItem) {
@@ -216,6 +220,24 @@ public class ArchiveViewController extends FXController {
             return;
         }
         archiveService.addFolder(archiveFile,item,target);
+    }
+
+    public void onRenameItem(ActionEvent event) {
+        ArchiveEntry item = contentTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            item = archiveTree.getRoot().getValue();
+        }
+        ArchiveFile file = item.getFile();
+        if (file == null) {
+            return;
+        }
+        RenameView renameView = findView(RenameView.class);
+        renameView.show();
+        String newName = renameView.getResult();
+        if (newName == null) {
+            return;
+        }
+        archiveService.rename(item.getFile(),item,newName);
     }
 
 }

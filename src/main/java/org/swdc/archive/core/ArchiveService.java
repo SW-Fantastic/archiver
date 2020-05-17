@@ -4,6 +4,7 @@ import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.fx.services.Service;
 
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 
 public class ArchiveService extends Service {
 
@@ -49,7 +50,16 @@ public class ArchiveService extends Service {
         }
         Class resolverClass = file.processor();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
-        resolver.extractFile(file,item,target);
+        CompletableFuture.runAsync(() -> resolver.extractFile(file,item,target));
+    }
+
+    public void rename(ArchiveFile file, ArchiveEntry target, String name) {
+        if (file == null || name == null || name.isBlank() || target == null) {
+            return;
+        }
+        Class resolverClass = file.processor();
+        ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
+        resolver.rename(file,target,name);
     }
 
 }

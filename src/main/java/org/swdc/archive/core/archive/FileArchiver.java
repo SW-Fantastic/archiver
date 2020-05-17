@@ -6,7 +6,7 @@ import org.swdc.archive.core.ArchiveFile;
 
 import java.io.File;
 
-public interface ArchiveProcessor {
+public interface FileArchiver {
 
     void addFile(ArchiveFile target,ArchiveEntry entry, File file);
 
@@ -15,6 +15,8 @@ public interface ArchiveProcessor {
     boolean removeFile(ArchiveFile target, ArchiveEntry entry);
 
     void createArchive(File target);
+
+    void rename(ArchiveFile file, ArchiveEntry target, String newName);
 
     void moveFile(ArchiveFile file, ArchiveEntry form, ArchiveEntry target);
 

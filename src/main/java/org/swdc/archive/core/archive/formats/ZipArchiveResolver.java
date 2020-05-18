@@ -37,6 +37,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             progressView.update("读取文件编码格式：" + charset.name(),10);
             ArchiveFile zipArchiveFile = new ArchiveFile(file);
             zipArchiveFile.setCharset(charset);
+            zipArchiveFile.setWriteable(true);
 
             ZipFile zipFile = new ZipFile(file);
             zipFile.setCharset(charset);
@@ -205,30 +206,6 @@ public class ZipArchiveResolver extends ArchiveResolver {
         } catch (Exception e) {
             logger.error("fail to rename file or folder", e);
         }
-    }
-
-    @Override
-    public void moveFile(ArchiveFile file, ArchiveEntry form, ArchiveEntry target) {
-        if(!target.isDictionary()) {
-            return;
-        }
-        ZipFile zipFile = new ZipFile(file.getFile());
-        zipFile.setCharset(file.getCharset());
-        try {
-            if (!form.isDictionary()) {
-                FileHeader header = zipFile.getFileHeader(form.getPath());
-                String parent = form.getParent().getPath();
-                String newName = target.getPath().replace(parent,target.getPath()) + "/" + form.getFileName();
-                zipFile.renameFile(header,newName);
-            } else {
-                for (ArchiveEntry entry: form.getChildren()) {
-                    moveFile(file,entry,target);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("fail to move archive entry ",e);
-        }
-
     }
 
     @Override

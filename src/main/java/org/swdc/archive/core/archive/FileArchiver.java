@@ -18,8 +18,6 @@ public interface FileArchiver {
 
     void rename(ArchiveFile file, ArchiveEntry target, String newName);
 
-    void moveFile(ArchiveFile file, ArchiveEntry form, ArchiveEntry target);
-
     void extractFile(ArchiveFile file, ArchiveEntry entry, File target);
 
     void extractFiles(ArchiveFile file, File target);

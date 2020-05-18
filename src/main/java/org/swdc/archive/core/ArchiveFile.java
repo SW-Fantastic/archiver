@@ -17,6 +17,10 @@ public class ArchiveFile  {
 
     @Getter
     @Setter
+    private boolean writeable;
+
+    @Getter
+    @Setter
     private Class resolver = null;
 
     public ArchiveFile(File file) {

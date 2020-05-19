@@ -12,7 +12,7 @@ public interface FileArchiver {
 
     void addFolder(ArchiveFile target, ArchiveEntry position, File folder);
 
-    boolean removeFile(ArchiveFile target, ArchiveEntry entry);
+    void removeFile(ArchiveFile target, ArchiveEntry entry);
 
     void createArchive(File target);
 

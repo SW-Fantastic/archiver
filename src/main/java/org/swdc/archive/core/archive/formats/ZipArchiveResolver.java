@@ -166,21 +166,20 @@ public class ZipArchiveResolver extends ArchiveResolver {
     }
 
     @Override
-    public boolean removeFile(ArchiveFile target, ArchiveEntry entry) {
+    public void removeFile(ArchiveFile target, ArchiveEntry entry) {
         try {
             ZipFile zipFile = new ZipFile(target.getFile());
             zipFile.setCharset(target.getCharset());
             FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
             if (header == null) {
-                return false;
+                return;
             }
             zipFile.removeFile(header);
             removeEntry(target.getRootEntry(),entry);
             this.emit(new ViewRefreshEvent(entry,this));
-            return true;
         } catch (Exception e) {
             logger.error("fail to remove file", e);
-            return false;
+            return;
         }
     }
 

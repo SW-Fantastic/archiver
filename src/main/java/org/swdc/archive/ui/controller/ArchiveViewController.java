@@ -124,6 +124,8 @@ public class ArchiveViewController extends FXController {
             ArchiveEntry item = archiveTree.getSelectionModel().getSelectedItem().getValue();
             contentTable.getItems().clear();
             contentTable.getItems().addAll(item.getChildren());
+
+            archiveTree.refresh();
         });
     }
 

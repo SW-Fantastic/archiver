@@ -15,6 +15,7 @@ import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.ProgressView;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -101,6 +102,7 @@ public class SevenZArchiveResolver extends ArchiveResolver {
         private boolean folder;
         private String relative;
         private long size;
+        private int index;
     }
 
     /**
@@ -226,10 +228,7 @@ public class SevenZArchiveResolver extends ArchiveResolver {
                 return null;
             }));
 
-            fileOutStream.close();
-            archive.close();
-            fileInStream.close();
-            origin.close();
+            this.closeAllResources(fileOutStream,archive,fileInStream,origin);
             target.getFile().delete();
             File temp = new File(target.getFile().getAbsolutePath() + ".tmp");
             temp.renameTo(target.getFile());
@@ -355,11 +354,7 @@ public class SevenZArchiveResolver extends ArchiveResolver {
                     }
                     return null;
                 }));
-
-                fileOutStream.close();
-                archive.close();
-                fileInStream.close();
-                origin.close();
+                this.closeAllResources(fileOutStream,archive,fileInStream,origin);
                 target.getFile().delete();
                 File temp = new File(target.getFile().getAbsolutePath() + ".tmp");
                 temp.renameTo(target.getFile());
@@ -425,11 +420,7 @@ public class SevenZArchiveResolver extends ArchiveResolver {
                         }
                     }
                     if (removeIdx == -1) {
-                        archive.close();
-                        archiveIn.close();
-                        originalFile.close();
-                        fileOutStream.close();
-                        originTemp.close();
+                        this.closeAllResources(archive,archiveIn,originalFile,fileOutStream,originTemp);
                         return;
                     }
                 } else {
@@ -458,29 +449,23 @@ public class SevenZArchiveResolver extends ArchiveResolver {
                         return factory.createOutItem(i);
                     }, i -> null));
                 } catch (Exception e) {
-                    archive.close();
-                    archiveIn.close();
-                    originalFile.close();
-                    fileOutStream.close();
-                    originTemp.close();
+                    this.closeAllResources(archive,archiveIn,originalFile,fileOutStream,originTemp);
                     File temp = new File(target.getFile().getAbsolutePath() + ".tmp");
                     temp.delete();
                     progressView.finish();
                     logger.error("can not remove some file",e);
                     return;
                 }
-                archive.close();
-                archiveIn.close();
-                originalFile.close();
-                fileOutStream.close();
-                originTemp.close();
+                this.closeAllResources(archive,archiveIn,originalFile,fileOutStream,originTemp);
                 target.getFile().delete();
                 File temp = new File(target.getFile().getAbsolutePath() + ".tmp");
                 temp.renameTo(target.getFile());
                 if (reIndex) {
                     removeFileImpl(target,entry,false, consumer);
                 }
-                consumer.accept(null);
+                if (consumer != null) {
+                    consumer.accept(null);
+                }
                 progressView.finish();
             } catch (Exception e) {
                 logger.error("fail to remove file",e);
@@ -495,17 +480,187 @@ public class SevenZArchiveResolver extends ArchiveResolver {
 
     @Override
     public void rename(ArchiveFile file, ArchiveEntry target, String newName) {
+        try {
+            RandomAccessFile origin = new RandomAccessFile(file.getFile().getAbsolutePath(), "rw");
+            RandomAccessFile originTemp = new RandomAccessFile(file.getFile().getAbsolutePath() + ".tmp", "rw");
+            RandomAccessFileInStream fileInStream = new RandomAccessFileInStream(origin);
+            RandomAccessFileOutStream fileOutStream = new RandomAccessFileOutStream(originTemp);
+            IInArchive archive = SevenZip.openInArchive(ArchiveFormat.SEVEN_ZIP, fileInStream);
+            if (archive == null) {
+                return;
+            }
+            String pathParent = target.getParent().getPath().substring(1);
 
+            while (pathParent.startsWith("/")) {
+                pathParent = pathParent.substring(1);
+            }
+
+            String pathOld = target.getPath().substring(1);
+            while (pathOld.startsWith("/")) {
+                pathOld = pathOld.substring(1);
+            }
+
+            Map<Integer,SevenEntry> updateIndexes = new HashMap<>();
+            if (!target.isDictionary()) {
+                int replacedIndex = -1;
+                for (int idx = 0; idx < archive.getNumberOfItems(); idx++) {
+                    String entryPath = archive.getStringProperty(idx, PropID.PATH).replace("\\", "/");
+                    boolean isFolder = archive.getStringProperty(idx, PropID.IS_FOLDER).equals("+");
+                    if (entryPath.equals(pathOld)) {
+                        replacedIndex = idx;
+                        updateIndexes.put(idx,SevenEntry.builder()
+                                .index(idx)
+                                .folder(isFolder)
+                                .relative(entryPath.replace("\\","/"))
+                                .build());
+                        break;
+                    }
+                }
+                if (replacedIndex == -1) {
+                    this.closeAllResources(archive,fileInStream,origin,fileOutStream,originTemp);
+                    return;
+                }
+            } else {
+                for (int idx = 0; idx < archive.getNumberOfItems(); idx++) {
+                    String entryPath = archive.getStringProperty(idx, PropID.PATH).replace("\\", "/");
+                    boolean isFolder = archive.getStringProperty(idx, PropID.IS_FOLDER).equals("+");
+                    if (entryPath.startsWith(pathOld)) {
+                        updateIndexes.put(idx,SevenEntry.builder()
+                                .index(idx)
+                                .folder(isFolder)
+                                .relative(entryPath.replace("\\","/"))
+                                .build());
+                    }
+                }
+            }
+
+            IOutUpdateArchive out = archive.getConnectedOutArchive();
+            String pathUpdate = pathParent;
+            out.updateItems(fileOutStream,archive.getNumberOfItems(),createOutCallback((i, outItemFactory) -> {
+                if (updateIndexes.containsKey(i)) {
+                    IOutItem7z item = (IOutItem7z) outItemFactory.createOutItem(i);
+                    SevenEntry entry = updateIndexes.get(i);
+                    String newPath = entry.getRelative().replace(pathUpdate, "");
+                    newPath = pathUpdate + newPath.replaceFirst(target.getFileName(), newName);
+                    item.setPropertyPath(newPath.replace("/","\\"));
+                    item.setPropertyIsDir(entry.isFolder());
+                    item.setUpdateIsNewProperties(true);
+                    return item;
+                }
+                return outItemFactory.createOutItem(i);
+            }, i -> null));
+            this.closeAllResources(archive,fileInStream,origin,fileOutStream,originTemp);
+            file.getFile().delete();
+            File temp = new File(file.getFile().getAbsolutePath() + ".tmp");
+            temp.renameTo(file.getFile());
+            if (target.isDictionary()) {
+                this.removeFileImpl(file,target,false, (Void) -> {
+                    target.setFileName(newName);
+                    this.emit(new ViewRefreshEvent(target,this));
+                });
+            } else {
+                target.setFileName(newName);
+                this.emit(new ViewRefreshEvent(target,this));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void extractFile(ArchiveFile file, ArchiveEntry entry, File target) {
-
+        CompletableFuture.runAsync(() -> {
+            try {
+                progressView.show();
+                String filePath = target.getAbsoluteFile().getPath();
+                String path = entry.getPath().substring(1);
+                while (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                path = path.substring(0,path.length() - 1);
+                SevenZFile sevenZFile = new SevenZFile(file.getFile());
+                Iterable<SevenZArchiveEntry> iterable = sevenZFile.getEntries();
+                Iterator<SevenZArchiveEntry> iterator = iterable.iterator();
+                while (iterator.hasNext()) {
+                    SevenZArchiveEntry sevenEntry = iterator.next();
+                    progressView.update("正在索引文件",0);
+                    if (!sevenEntry.getName().startsWith(path)) {
+                        continue;
+                    }
+                    progressView.update("解压文件：" + sevenEntry.getName(), 0);
+                    if (sevenEntry.isDirectory()) {
+                        File dir = new File(filePath + File.separator + sevenEntry.getName());
+                        dir.mkdirs();
+                        continue;
+                    }
+                    File targetFile = new File(filePath + File.separator + sevenEntry.getName());
+                    if (!targetFile.getParentFile().exists()){
+                        targetFile.getParentFile().mkdirs();
+                    }
+                    InputStream in = sevenZFile.getInputStream(sevenEntry);
+                    FileOutputStream outputStream = new FileOutputStream(targetFile);
+                    byte[] buffer = new byte[4096];
+                    double progress = 0;
+                    long total = sevenEntry.getSize();
+                    long current = 0;
+                    while (in.read(buffer) > 0) {
+                        outputStream.write(buffer);
+                        current = current + buffer.length;
+                        progress = (current + 0.0) / total;
+                        progressView.update("正在解压：" + sevenEntry.getName(), progress);
+                    }
+                    outputStream.flush();
+                    this.closeAllResources(in,outputStream);
+                    progressView.finish();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
     public void extractFiles(ArchiveFile file, File target) {
-
+        CompletableFuture.runAsync(() -> {
+            try {
+                progressView.show();
+                String filePath = target.getAbsoluteFile().getPath();
+                SevenZFile sevenZFile = new SevenZFile(file.getFile());
+                Iterable<SevenZArchiveEntry> iterable = sevenZFile.getEntries();
+                Iterator<SevenZArchiveEntry> iterator = iterable.iterator();
+                progressView.update("正在索引文件",0);
+                while (iterator.hasNext()) {
+                    SevenZArchiveEntry entry = iterator.next();
+                    progressView.update("解压文件：" + entry.getName(), 0);
+                    if (entry.isDirectory()) {
+                        File dir = new File(filePath + File.separator + entry.getName());
+                        dir.mkdirs();
+                        continue;
+                    }
+                    File targetFile = new File(filePath + File.separator + entry.getName());
+                    if (!targetFile.getParentFile().exists()){
+                        targetFile.getParentFile().mkdirs();
+                    }
+                    InputStream in = sevenZFile.getInputStream(entry);
+                    FileOutputStream outputStream = new FileOutputStream(targetFile);
+                    byte[] buffer = new byte[4096];
+                    double progress = 0;
+                    long total = entry.getSize();
+                    long current = 0;
+                    while (in.read(buffer) > 0) {
+                        outputStream.write(buffer);
+                        current = current + buffer.length;
+                        progress = (current + 0.0) / total;
+                        progressView.update("正在解压：" + entry.getName(), progress);
+                    }
+                    outputStream.flush();
+                    this.closeAllResources(in,outputStream);
+                }
+                progressView.finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -578,6 +733,21 @@ public class SevenZArchiveResolver extends ArchiveResolver {
         } catch (Exception e) {
             logger.error("fail to load sevenZ file", e);
             return null;
+        }
+    }
+
+    private void closeAllResources(Object ...closeables) throws IOException {
+        for (Object closeable: closeables) {
+            if (Closeable.class.isAssignableFrom(closeable.getClass())) {
+                ((Closeable) closeable).close();
+            } else {
+                try {
+                    Method close = closeable.getClass().getMethod("close");
+                    close.invoke(closeable);
+                } catch (Exception e) {
+                    throw new IOException(e);
+                }
+            }
         }
     }
 

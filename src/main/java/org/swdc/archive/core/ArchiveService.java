@@ -57,6 +57,11 @@ public class ArchiveService extends Service {
         if (file == null || name == null || name.isBlank() || target == null) {
             return;
         }
+        for(ArchiveEntry entry:target.getChildren()) {
+            if (entry.getFileName().equals(name)) {
+                return;
+            }
+        }
         Class resolverClass = file.getResolver();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
         resolver.rename(file,target,name);

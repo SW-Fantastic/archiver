@@ -53,6 +53,10 @@ module fxArchive {
             fx.framework.core,
             fx.framework.resource;
 
+    opens viewIcons to
+            fx.framework.core,
+            fx.framework.resource;
+
     opens org.swdc.archive to
             javafx.graphics;
 }

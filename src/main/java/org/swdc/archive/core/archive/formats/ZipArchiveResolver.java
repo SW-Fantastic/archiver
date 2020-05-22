@@ -43,6 +43,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             zipFile.setCharset(charset);
             progressView.update("验证压缩文件：" + file.getName(), 20);
             if (!zipFile.isValidZipFile()) {
+                progressView.finish();
                 return null;
             }
             ArchiveEntry rootEntry = new ArchiveEntry();

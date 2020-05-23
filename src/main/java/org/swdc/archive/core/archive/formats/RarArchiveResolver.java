@@ -1,25 +1,31 @@
 package org.swdc.archive.core.archive.formats;
 
+import javafx.application.Platform;
 import lombok.Builder;
 import lombok.Data;
-import net.sf.sevenzipjbinding.ArchiveFormat;
-import net.sf.sevenzipjbinding.IInArchive;
-import net.sf.sevenzipjbinding.PropID;
-import net.sf.sevenzipjbinding.SevenZip;
+import net.sf.sevenzipjbinding.*;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
-import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.ui.view.ProgressView;
+
+import static org.swdc.archive.core.archive.formats.SevenZipSupport.createExtractCallback;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class RarArchiveResolver extends ArchiveResolver implements SevenZipSupport {
 
     private boolean writeable = false;
+
+    private ProgressView progressView;
 
     @Data
     @Builder
@@ -35,6 +41,7 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
     public void initialize() {
         try {
             this.initializePlatforms(this);
+            Platform.runLater(() -> this.progressView = findView(ProgressView.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -72,7 +79,64 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
 
     @Override
     public void extractFiles(ArchiveFile file, File target) {
-
+        CompletableFuture.runAsync(() -> {
+            try {
+                progressView.show();
+                RandomAccessFile originalFile = new RandomAccessFile(file.getFile().getAbsolutePath(), "rw");
+                RandomAccessFileInStream inStream = new RandomAccessFileInStream(originalFile);
+                IInArchive archive = null;
+                progressView.update("检测文件类型",0);
+                try {
+                    archive = SevenZip.openInArchive(ArchiveFormat.RAR5, inStream);
+                } catch (Exception e) {
+                    archive = SevenZip.openInArchive(ArchiveFormat.RAR, inStream);
+                }
+                int counts = archive.getNumberOfItems();
+                List<Integer> allIndexes = new ArrayList<>();
+                for (int idx = 0; idx < counts; idx ++) {
+                    progressView.update("正在索引", (idx + 0.0) / counts);
+                    boolean isFolder = archive.getStringProperty(idx,PropID.IS_FOLDER).equals("+");
+                    if (!isFolder) {
+                        allIndexes.add(idx);
+                    }
+                }
+                IInArchive inArchive = archive;
+                progressView.update("正在开始：",0);
+                archive.extract(allIndexes.stream().mapToInt(i -> i).toArray(),false,createExtractCallback((i, mode) -> {
+                    try {
+                        String path = inArchive.getStringProperty(i,PropID.PATH);
+                        File targetFile = new File(target.getAbsolutePath() + File.separator + path.replace("\\","/"));
+                        if (targetFile.exists()) {
+                            targetFile.delete();
+                        }
+                        return bytes-> {
+                            try {
+                                progressView.update("正在解压：" + path,(i + 0.0) / counts);
+                                if (!targetFile.getParentFile().exists()) {
+                                    targetFile.getParentFile().mkdirs();
+                                }
+                                FileOutputStream outputStream = new FileOutputStream(targetFile,true);
+                                outputStream.write(bytes);
+                                outputStream.close();
+                                return bytes.length;
+                            } catch (Exception e) {
+                                logger.error("fail to extract file: ",e);
+                                return 0;
+                            }
+                        };
+                    } catch (Exception e) {
+                        logger.error("fail to extract file: ",e);
+                        return null;
+                    }
+                },result -> {
+                    return;
+                }));
+                this.closeAllResources(archive,inStream,originalFile);
+                progressView.finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -120,13 +184,16 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
     @Override
     public ArchiveFile loadFile(File file) {
         try {
+            progressView.show();
             ArchiveFile archiveFile = new ArchiveFile(file);
             RandomAccessFile originalFile = new RandomAccessFile(file.getAbsolutePath(),"rw");
             RandomAccessFileInStream inStream = new RandomAccessFileInStream(originalFile);
             IInArchive archive = null;
+            progressView.update("检测格式：普通RAR", 0);
             try {
                 archive = SevenZip.openInArchive(ArchiveFormat.RAR5,inStream);
             } catch (Exception e) {
+                progressView.update("检测格式：RAR5", 0);
                 archive = SevenZip.openInArchive(ArchiveFormat.RAR,inStream);
             }
 
@@ -136,10 +203,13 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
             root.setDictionary(true);
             root.setFile(archiveFile);
             archiveFile.setRoot(root);
+            archiveFile.setResolver(this.getClass());
+            archiveFile.setWriteable(false);
 
             int counts = archive.getNumberOfItems();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             for (int idx = 0; idx < counts; idx++) {
+                progressView.update("索引内容：", (idx + 0.0) / counts);
                 Date lastModify = sdf.parse(archive.getStringProperty(idx,PropID.LAST_MODIFICATION_TIME));
                 RarEntry entry = RarEntry.builder()
                         .name(archive.getStringProperty(idx,PropID.NAME))
@@ -150,6 +220,7 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
                         .build();
                 resolveEntry(archiveFile, archiveFile.getRootEntry(),entry);
             }
+            progressView.finish();
             return archiveFile;
         } catch (Exception e) {
             logger.error("fail to read rar file", e);

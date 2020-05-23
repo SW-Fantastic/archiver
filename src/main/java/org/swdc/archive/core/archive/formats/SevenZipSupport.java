@@ -8,6 +8,7 @@ import org.swdc.fx.AppComponent;
 import org.swdc.fx.LifeCircle;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -34,6 +35,44 @@ public interface SevenZipSupport extends LifeCircle {
         ISequentialInStream getStream(int i) throws SevenZipException, FileNotFoundException;
     }
 
+    @FunctionalInterface
+    interface IndexedItemOutputStream {
+        ISequentialOutStream getStream(int i, ExtractAskMode mode);
+    }
+
+    @FunctionalInterface
+    interface ResultCallBack {
+        void onResult(ExtractOperationResult result);
+    }
+
+    static IArchiveExtractCallback createExtractCallback(IndexedItemOutputStream out, ResultCallBack callback) {
+        return new IArchiveExtractCallback() {
+            @Override
+            public ISequentialOutStream getStream(int i, ExtractAskMode extractAskMode) throws SevenZipException {
+                return out.getStream(i,extractAskMode);
+            }
+
+            @Override
+            public void prepareOperation(ExtractAskMode extractAskMode) throws SevenZipException {
+
+            }
+
+            @Override
+            public void setOperationResult(ExtractOperationResult extractOperationResult) throws SevenZipException {
+                callback.onResult(extractOperationResult);
+            }
+
+            @Override
+            public void setTotal(long l) throws SevenZipException {
+
+            }
+
+            @Override
+            public void setCompleted(long l) throws SevenZipException {
+
+            }
+        };
+    }
 
     /**
      * 创建7z的文件写入接口。
@@ -73,6 +112,21 @@ public interface SevenZipSupport extends LifeCircle {
 
             }
         };
+    }
+
+    default void closeAllResources(Object ...closeables) throws IOException {
+        for (Object closeable: closeables) {
+            if (Closeable.class.isAssignableFrom(closeable.getClass())) {
+                ((Closeable) closeable).close();
+            } else {
+                try {
+                    Method close = closeable.getClass().getMethod("close");
+                    close.invoke(closeable);
+                } catch (Exception e) {
+                    throw new IOException(e);
+                }
+            }
+        }
     }
 
     default void initializePlatforms(AppComponent component) {

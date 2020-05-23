@@ -1,5 +1,6 @@
 package org.swdc.archive.ui.view;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -35,18 +36,23 @@ public class MainView extends FXView {
 
     private SimpleDoubleProperty contentHeightProp = new SimpleDoubleProperty();
 
+    private SimpleBooleanProperty writeable = new SimpleBooleanProperty();
+
+    private SimpleBooleanProperty readable = new SimpleBooleanProperty();
+
     private ArchiveFile archiveFile;
 
     @Override
     public void initialize() {
-        this.configButtonIcon("addFile", "plus","向当前位置添加文件");
-        this.configButtonIcon("removeFile","trash", "移除此处的文件");
+        this.configButtonIcon("addFile", "plus","向当前位置添加文件",writeable);
+        this.configButtonIcon("removeFile","trash", "移除此处的文件",writeable);
 
         MenuButton unArchive = findById("unarchivedp");
         unArchive.setPadding(new Insets(4,4,4,4));
         unArchive.setFont(fontawsomeService.getFont(FontSize.MIDDLE));
         unArchive.setText(fontawsomeService.getFontIcon("tasks"));
         unArchive.setTooltip(new Tooltip("全部解压"));
+        unArchive.disableProperty().bind(readable.not());
 
         Stage stage = getStage();
         stage.setMinWidth(800);
@@ -68,27 +74,30 @@ public class MainView extends FXView {
     }
 
     private void toStartView(){
-        ToolBar toolBar = findById("tools");
-        toolBar.getItems().stream().forEach(item -> item.setDisable(true));
+        writeable.setValue(false);
+        readable.setValue(false);
         BorderPane content = findById("contentView");
         content.setCenter(startView.getView());
     }
 
-    private void configButtonIcon(String btnId, String iconName, String tooltip) {
+    private void configButtonIcon(String btnId, String iconName, String tooltip, SimpleBooleanProperty enable) {
         Button button = findById(btnId);
         button.setFont(fontawsomeService.getFont(FontSize.MIDDLE));
         button.setText(fontawsomeService.getFontIcon(iconName));
         button.setPadding(new Insets(4,4,4,4));
         button.setTooltip(new Tooltip(tooltip));
+        button.disableProperty().bind(enable.not());
     }
 
     public synchronized void setArchiveFile(ArchiveFile archiveFile) {
         BorderPane content = findById("contentView");
-        ToolBar toolBar = findById("tools");
-        toolBar.getItems().stream().forEach(item -> item.setDisable(false));
         content.setCenter(archiveView.getView());
         this.archiveFile = archiveFile;
         this.archiveView.refreshTree(archiveFile);
+        readable.setValue(true);
+        if (archiveFile.isWriteable()) {
+            writeable.setValue(true);
+        }
     }
 
     public synchronized ArchiveFile getArchiveFile() {

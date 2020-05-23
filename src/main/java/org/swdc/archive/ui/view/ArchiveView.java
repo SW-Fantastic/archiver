@@ -24,6 +24,8 @@ public class ArchiveView extends FXView {
 
     private ContextMenu tableContextMenu = null;
 
+    private SimpleBooleanProperty writeable = new SimpleBooleanProperty(false);
+
     @Override
     public void initialize() {
         Button goBack = findById("goBack");
@@ -37,12 +39,21 @@ public class ArchiveView extends FXView {
         ArchiveViewController controller = this.getLoader().getController();
 
         TableView<ArchiveEntry> archiveTable = findById("archiveTable");
-        SimpleBooleanProperty disabled = new SimpleBooleanProperty(true);
+        SimpleBooleanProperty menuSelectionWriteDisable = new SimpleBooleanProperty(true);
+        SimpleBooleanProperty menuSelectionReadDisable = new SimpleBooleanProperty(true);
+
+
         archiveTable.getSelectionModel().selectedItemProperty().addListener(o -> {
+
             if (archiveTable.getSelectionModel().getSelectedItem() == null) {
-                disabled.setValue(true);
+                menuSelectionWriteDisable.setValue(true);
+                menuSelectionReadDisable.setValue(true);
             } else {
-                disabled.setValue(false);
+                ArchiveFile file = archiveTable.getSelectionModel().getSelectedItem().getFile();
+                if (file.isWriteable()) {
+                    menuSelectionWriteDisable.setValue(false);
+                }
+                menuSelectionReadDisable.setValue(false);
             }
         });
 
@@ -54,9 +65,12 @@ public class ArchiveView extends FXView {
         MenuItem extractAll = UIUtil.createMenuItem("全部解压", controller::extractAll);
         MenuItem rename = UIUtil.createMenuItem("重命名", controller::onRenameItem);
 
-        extractSelect.disableProperty().bind(disabled);
-        delete.disableProperty().bind(disabled);
-        rename.disableProperty().bind(disabled);
+        extractSelect.disableProperty().bind(menuSelectionReadDisable);
+        delete.disableProperty().bind(menuSelectionWriteDisable);
+        rename.disableProperty().bind(menuSelectionWriteDisable);
+
+        addFile.disableProperty().bind(this.writeable.not());
+        addFolder.disableProperty().bind(this.writeable.not());
 
         this.tableContextMenu.getItems().addAll(addFile, addFolder,
                 new SeparatorMenuItem(),
@@ -68,6 +82,7 @@ public class ArchiveView extends FXView {
     public void refreshTree(ArchiveFile archiveFile) {
         ArchiveViewController controller = getLoader().getController();
         controller.refreshTree(archiveFile);
+        writeable.setValue(archiveFile.isWriteable());
     }
 
     public ArchiveEntry getSelectedEntry() {

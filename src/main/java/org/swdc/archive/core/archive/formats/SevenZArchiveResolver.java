@@ -609,19 +609,6 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
         }
     }
 
-    private void closeAllResources(Object ...closeables) throws IOException {
-        for (Object closeable: closeables) {
-            if (Closeable.class.isAssignableFrom(closeable.getClass())) {
-                ((Closeable) closeable).close();
-            } else {
-                try {
-                    Method close = closeable.getClass().getMethod("close");
-                    close.invoke(closeable);
-                } catch (Exception e) {
-                    throw new IOException(e);
-                }
-            }
-        }
-    }
+
 
 }

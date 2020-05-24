@@ -10,6 +10,7 @@ import org.apache.commons.compress.archivers.sevenz.*;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.ProgressView;
 
@@ -59,6 +60,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
             this.initializePlatforms(this);
             Platform.runLater(() -> this.progressView = findView(ProgressView.class));
         } catch (Exception e) {
+            UIUtil.notification("无法载入native动态类库: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to initialize : ",e);
         }
     }
@@ -115,6 +117,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
             entry.getChildren().add(created);
             this.emit(new ViewRefreshEvent(created,this));
         } catch (Exception e) {
+            UIUtil.notification("文件添加失败: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to add file", e);
         }
     }
@@ -159,6 +162,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
             return paths;
         } catch (Exception e) {
             logger.error("fail to read folder", e);
+            UIUtil.notification("文件索引失败: \n" + UIUtil.exceptionToString(e), this);
             return Collections.emptyList();
         }
     }
@@ -222,7 +226,8 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
                             }
                             return new RandomAccessFileInStream(new RandomAccessFile(item.getFullPath(),"r"));
                         } catch (Exception e) {
-                            logger.error("fail to open input file");
+                            UIUtil.notification("部分文件添加失败: \n" + UIUtil.exceptionToString(e), this);
+                            logger.error("fail to open input file",e);
                         }
                     }
                     return null;
@@ -243,6 +248,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
                 progressView.finish();
             } catch (Exception e) {
                 logger.error("fail to add folder: ",e);
+                UIUtil.notification("文件夹添加失败: \n" + UIUtil.exceptionToString(e), this);
                 progressView.finish();
             }
         });
@@ -326,6 +332,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
                     File temp = new File(target.getFile().getAbsolutePath() + ".tmp");
                     temp.delete();
                     progressView.finish();
+                    UIUtil.notification("部分文件删除失败: \n" + UIUtil.exceptionToString(e), this);
                     logger.error("can not remove some file",e);
                     return;
                 }
@@ -342,6 +349,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
                 progressView.finish();
             } catch (Exception e) {
                 logger.error("fail to remove file",e);
+                UIUtil.notification("文件删除失败: \n" + UIUtil.exceptionToString(e), this);
             }
         });
     }
@@ -436,6 +444,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
                 this.emit(new ViewRefreshEvent(target,this));
             }
         } catch (Exception e) {
+            UIUtil.notification("文件重命名失败: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to extract file", e);
         }
     }
@@ -487,6 +496,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
                     progressView.finish();
                 }
             } catch (Exception e) {
+                UIUtil.notification("文件解压失败: \n" + UIUtil.exceptionToString(e), this);
                 logger.error("fail to extract file",e);
             }
         });
@@ -531,7 +541,8 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
                 }
                 progressView.finish();
             } catch (Exception e) {
-                e.printStackTrace();
+                UIUtil.notification("文件解压失败: \n" + UIUtil.exceptionToString(e), this);
+                logger.error("文件解压失败",e);
             }
         });
     }
@@ -604,6 +615,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
             progressView.finish();
             return archiveFile;
         } catch (Exception e) {
+            UIUtil.notification("文件载入失败: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to load sevenZ file", e);
             return null;
         }

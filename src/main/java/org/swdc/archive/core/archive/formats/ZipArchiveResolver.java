@@ -1,18 +1,25 @@
 package org.swdc.archive.core.archive.formats;
 
 import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.util.Duration;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.progress.ProgressMonitor;
+import org.controlsfx.control.Notifications;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.ui.DataUtil;
+import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
+import org.swdc.archive.ui.view.MessageView;
 import org.swdc.archive.ui.view.ProgressView;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Consumer;
@@ -44,6 +51,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             progressView.update("验证压缩文件：" + file.getName(), 20);
             if (!zipFile.isValidZipFile()) {
                 progressView.finish();
+                UIUtil.notification("无法打开文件：" + file.getName() + "，他不是一个有效的zip压缩文件。",this);
                 return null;
             }
             ArchiveEntry rootEntry = new ArchiveEntry();
@@ -126,7 +134,8 @@ public class ZipArchiveResolver extends ArchiveResolver {
                     }
                     this.emit(new ViewRefreshEvent(null,this));
                 } catch (Exception e) {
-                    logger.error("fail to reload file tree");
+                    UIUtil.notification("部分文件添加失败: \n" + UIUtil.exceptionToString(e), this);
+                    logger.error("fail to reload file tree",e);
                 }
             });
             progressView.show();
@@ -134,6 +143,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             zipFile.setRunInThread(true);
             zipFile.addFolder(folder,parameters);
         } catch (Exception e) {
+            UIUtil.notification("添加文件夹失败: \n" + UIUtil.exceptionToString(e),this);
             logger.error("fail to add folder", e);
         }
     }
@@ -162,7 +172,8 @@ public class ZipArchiveResolver extends ArchiveResolver {
             entry.getChildren().add(created);
             this.emit(new ViewRefreshEvent(created,this));
         } catch (Exception e) {
-            logger.error("fail to add file");
+            UIUtil.notification("文件添加失败: \n" + UIUtil.exceptionToString(e), this);
+            logger.error("fail to add file",e);
         }
     }
 
@@ -179,6 +190,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             removeEntry(target.getRootEntry(),entry);
             this.emit(new ViewRefreshEvent(entry,this));
         } catch (Exception e) {
+            UIUtil.notification("文件删除失败: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to remove file", e);
             return;
         }
@@ -204,6 +216,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             target.setFileName(newName);
             this.emit(new ViewRefreshEvent(target,this));
         } catch (Exception e) {
+            UIUtil.notification("文件重命名失败: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to rename file or folder", e);
         }
     }
@@ -243,6 +256,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
                 this.extractFileImpl(file,item,target,true);
             }
         } catch (Exception e){
+            UIUtil.notification("文件解压失败: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to extract file: ",e);
         }
     }
@@ -259,6 +273,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
             zipFile.setRunInThread(true);
             zipFile.extractAll(target.getAbsolutePath());
         } catch (Exception e) {
+            UIUtil.notification("文件解压失败: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to extract files",e);
         }
     }

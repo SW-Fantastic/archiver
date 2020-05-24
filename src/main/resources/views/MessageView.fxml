@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="124.0" prefWidth="452.0" styleClass="dialog-pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <Label id="msgLbl" styleClass="msgLabel" text="Toast Message" wrapText="true" />
+         </children>
+         <padding>
+            <Insets left="18.0" right="18.0" />
+         </padding>
+      </HBox>
+   </center>
+   <padding>
+      <Insets bottom="18.0" top="18.0" />
+   </padding>
+</BorderPane>

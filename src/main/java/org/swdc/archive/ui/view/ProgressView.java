@@ -19,6 +19,9 @@ public class ProgressView extends FXView {
     public void initialize() {
         this.message = findById("message");
         this.progressBar = findById("progress");
+        this.getStage().setOnCloseRequest(e-> {
+            e.consume();
+        });
     }
 
     public void update(String message, double progress) {

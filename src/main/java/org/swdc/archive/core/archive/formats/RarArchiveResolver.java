@@ -74,7 +74,71 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
 
     @Override
     public void extractFile(ArchiveFile file, ArchiveEntry entry, File target) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                progressView.show();
+                RandomAccessFile originalFile = new RandomAccessFile(file.getFile().getAbsolutePath(), "rw");
+                RandomAccessFileInStream inStream = new RandomAccessFileInStream(originalFile);
+                IInArchive archive = null;
+                progressView.update("检测文件类型",0);
+                try {
+                    archive = SevenZip.openInArchive(ArchiveFormat.RAR5, inStream);
+                } catch (Exception e) {
+                    archive = SevenZip.openInArchive(ArchiveFormat.RAR, inStream);
+                }
+                int counts = archive.getNumberOfItems();
 
+                String targetPath = entry.getPath();
+                while (targetPath.startsWith("/")) {
+                    targetPath = targetPath.substring(1);
+                }
+                if (entry.isDictionary()) {
+                    targetPath = targetPath.substring(0,targetPath.length() - 1);
+                }
+                progressView.update("正在开始：",0);
+                List<Integer> allIndexes = new ArrayList<>();
+                for (int idx = 0; idx < counts; idx ++) {
+                    String path = archive.getStringProperty(idx,PropID.PATH).replace("\\","/");
+                    if (path.startsWith(targetPath) || path.equals(targetPath)) {
+                        allIndexes.add(idx);
+                    }
+                }
+                IInArchive inArchive = archive;
+                archive.extract(allIndexes.stream().mapToInt(i -> i).toArray(),false,createExtractCallback((i, mode) -> {
+                    try {
+                        String path = inArchive.getStringProperty(i,PropID.PATH);
+                        File targetFile = new File(target.getAbsolutePath() + File.separator + path.replace("\\","/"));
+                        if (targetFile.exists()) {
+                            targetFile.delete();
+                        }
+                        return bytes-> {
+                            try {
+                                progressView.update("正在解压：" + path,(i + 0.0) / allIndexes.size());
+                                if (!targetFile.getParentFile().exists()) {
+                                    targetFile.getParentFile().mkdirs();
+                                }
+                                FileOutputStream outputStream = new FileOutputStream(targetFile,true);
+                                outputStream.write(bytes);
+                                outputStream.close();
+                                return bytes.length;
+                            } catch (Exception e) {
+                                logger.error("fail to extract file: ",e);
+                                return 0;
+                            }
+                        };
+                    } catch (Exception e) {
+                        logger.error("fail to extract file: ",e);
+                        return null;
+                    }
+                },result -> {
+                    return;
+                }));
+                this.closeAllResources(archive,inStream,originalFile);
+                progressView.finish();
+            } catch (Exception e) {
+                logger.error("fail to extract file", e);
+            }
+        });
     }
 
     @Override

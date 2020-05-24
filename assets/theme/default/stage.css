@@ -1,3 +1,9 @@
+.notification-bar .pane {
+  -fx-background-color: rgba(253, 255, 223, 0);
+}
+.notification-bar .pane * .label {
+  -fx-font-family: "Noto Sans CJK DemiLight";
+}
 .dialog-pane {
   -fx-font-family: "Noto Sans CJK DemiLight";
   -fx-background-color: #fffcf2;

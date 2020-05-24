@@ -4,6 +4,7 @@ module fxArchive {
     requires javafx.fxml;
     requires javafx.graphics;
     requires slf4j.api;
+    requires org.controlsfx.controls;
 
     requires lombok;
     requires fx.framework.core;

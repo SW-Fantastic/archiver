@@ -192,9 +192,11 @@ public interface SevenZipSupport extends LifeCircle {
                     SevenZip.initLoadedLibraries();
                     setWriteable(true);
                 }
+            } else {
+                setWriteable(true);
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 

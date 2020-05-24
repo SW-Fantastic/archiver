@@ -67,6 +67,12 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
 
 
     @Override
+    public void saveComment(ArchiveFile file, String data) {
+        UIUtil.notification("此格式不允许修改压缩文件注释。",this);
+       return;
+    }
+
+    @Override
     public void addFile(ArchiveFile target, ArchiveEntry entry, File file) {
         try {
             RandomAccessFile origin = new RandomAccessFile(target.getFile().getAbsolutePath(), "rw");
@@ -595,10 +601,18 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
         try {
             progressView.show();
             progressView.update("正在读取文件：" + file.getName(), 0);
+
+            RandomAccessFile originalFile = new RandomAccessFile(file.getAbsolutePath(),"rw");
+            RandomAccessFileInStream inStream = new RandomAccessFileInStream(originalFile);
+            IInArchive archive = SevenZip.openInArchive(ArchiveFormat.SEVEN_ZIP,inStream);
+            String comment = archive.getStringArchiveProperty(PropID.COMMENT);
+            closeAllResources(archive,inStream,originalFile);
+
             SevenZFile sevenZFile = new SevenZFile(file);
             ArchiveFile archiveFile = new ArchiveFile(file);
             archiveFile.setResolver(this.getClass());
             archiveFile.setWriteable(this.writeable);
+            archiveFile.setComment(comment);
 
             Iterable<SevenZArchiveEntry> entryIterable = sevenZFile.getEntries();
             ArchiveEntry root = new ArchiveEntry();
@@ -620,7 +634,5 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
             return null;
         }
     }
-
-
 
 }

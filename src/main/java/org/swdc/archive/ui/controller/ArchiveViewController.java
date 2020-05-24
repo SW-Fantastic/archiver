@@ -48,6 +48,9 @@ public class ArchiveViewController extends FXController {
     @FXML
     private TextField txtPath;
 
+    @FXML
+    private TextArea comment;
+
     @Aware
     private ArchiveService archiveService = null;
 
@@ -76,6 +79,19 @@ public class ArchiveViewController extends FXController {
                 }
             }
         });
+    }
+
+    @FXML
+    private void saveComment() {
+        TreeItem<ArchiveEntry> entryTreeItem = archiveTree.getSelectionModel().getSelectedItem();
+        ArchiveEntry entry = null;
+        if (entryTreeItem != null) {
+            entry = entryTreeItem.getValue();
+        } else {
+            entry = contentTable.getSelectionModel().getSelectedItem();
+        }
+        ArchiveFile file = entry.getFile();
+        archiveService.updateComment(file,comment.getText());
     }
 
     @FXML
@@ -152,6 +168,7 @@ public class ArchiveViewController extends FXController {
         archiveTree.getSelectionModel().select(archiveTree.getRoot());
         contentTable.getItems().clear();
         contentTable.getItems().addAll(file.getRootEntry().getChildren());
+        this.comment.setText(file.getComment());
     }
 
     public void addFile(ActionEvent event) {

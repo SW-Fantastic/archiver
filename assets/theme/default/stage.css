@@ -206,3 +206,37 @@
 .scene .content-view .table-view .table-row-cell:filled:selected .label {
   -fx-text-fill: #fffcf2;
 }
+.scene .content-view .text-area,
+.scene .content-view .text-area * {
+  -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+.scene .content-view .text-area .scroll-bar,
+.scene .content-view .text-area * .scroll-bar {
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-font-size: 8;
+}
+.scene .content-view .text-area .scroll-bar .thumb,
+.scene .content-view .text-area * .scroll-bar .thumb {
+  -fx-background-color: #74a982;
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .content-view .text-area .scroll-bar .track,
+.scene .content-view .text-area * .scroll-bar .track {
+  -fx-background-color: rgba(255, 255, 255, 0.6);
+  -fx-border-color: #74a982;
+  -fx-border-radius: 12;
+}
+.scene .content-view .default-pane {
+  -fx-background-color: rgba(255, 255, 255, 0.6);
+}
+.scene .content-view .default-pane .button {
+  -fx-border-style: dashed;
+  -fx-border-color: rgba(0, 0, 0, 0);
+  -fx-border-width: 1px;
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-text-fill: #74a982;
+  -fx-border-radius: 6px;
+}
+.scene .content-view .default-pane .button:hover {
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}

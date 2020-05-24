@@ -1,5 +1,6 @@
 package org.swdc.archive.core;
 
+import javafx.scene.shape.Arc;
 import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.fx.services.Service;
 
@@ -65,6 +66,15 @@ public class ArchiveService extends Service {
         Class resolverClass = file.getResolver();
         ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
         resolver.rename(file,target,name);
+    }
+
+    public void updateComment(ArchiveFile file,String content) {
+        if (file == null || content == null || content.isBlank()) {
+            return;
+        }
+        Class resolverClass = file.getResolver();
+        ArchiveResolver resolver = (ArchiveResolver) findComponent(resolverClass);
+        resolver.saveComment(file,content);
     }
 
 }

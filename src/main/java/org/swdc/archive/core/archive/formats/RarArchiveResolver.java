@@ -8,6 +8,7 @@ import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.view.ProgressView;
 
 import static org.swdc.archive.core.archive.formats.SevenZipSupport.createExtractCallback;
@@ -70,6 +71,12 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
     @Override
     public void rename(ArchiveFile file, ArchiveEntry target, String newName) {
 
+    }
+
+    @Override
+    public void saveComment(ArchiveFile file, String data) {
+        UIUtil.notification("此格式不允许修改压缩文件注释。",this);
+        return;
     }
 
     @Override
@@ -270,6 +277,7 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
             archiveFile.setResolver(this.getClass());
             archiveFile.setWriteable(false);
 
+            archiveFile.setComment(archive.getStringArchiveProperty(PropID.COMMENT));
             int counts = archive.getNumberOfItems();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             for (int idx = 0; idx < counts; idx++) {

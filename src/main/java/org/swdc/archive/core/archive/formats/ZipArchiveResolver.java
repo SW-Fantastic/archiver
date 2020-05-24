@@ -1,25 +1,19 @@
 package org.swdc.archive.core.archive.formats;
 
 import javafx.application.Platform;
-import javafx.geometry.Pos;
-import javafx.util.Duration;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.progress.ProgressMonitor;
-import org.controlsfx.control.Notifications;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.ui.DataUtil;
 import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
-import org.swdc.archive.ui.view.MessageView;
 import org.swdc.archive.ui.view.ProgressView;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Consumer;
@@ -48,6 +42,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
 
             ZipFile zipFile = new ZipFile(file);
             zipFile.setCharset(charset);
+            zipArchiveFile.setComment(zipFile.getComment());
             progressView.update("验证压缩文件：" + file.getName(), 20);
             if (!zipFile.isValidZipFile()) {
                 progressView.finish();
@@ -73,8 +68,17 @@ public class ZipArchiveResolver extends ArchiveResolver {
         }
     }
 
+    @Override
+    public void saveComment(ArchiveFile file, String data) {
+        try {
+            ZipFile zipFile = new ZipFile(file.getFile());
+            zipFile.setComment(data);
+        } catch (Exception e) {
+            logger.error("fail to save comment");
+        }
+    }
 
-    private ArchiveEntry resolveEntry(ArchiveFile file,ArchiveEntry root, FileHeader archiveEntry){
+    private ArchiveEntry resolveEntry(ArchiveFile file, ArchiveEntry root, FileHeader archiveEntry){
         String fullPath = archiveEntry.getFileName();
         String[] paths = fullPath.split("/");
         ArchiveEntry parent = root;

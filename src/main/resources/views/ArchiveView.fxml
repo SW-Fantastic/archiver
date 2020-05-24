@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -11,7 +12,40 @@
    <center>
       <SplitPane dividerPositions="0.3090128755364807" prefHeight="436.0" prefWidth="628.0" BorderPane.alignment="CENTER">
          <items>
-            <TreeView id="archiveTree" fx:id="archiveTree" minWidth="230.0" prefHeight="200.0" prefWidth="200.0" />
+            <SplitPane dividerPositions="0.5" minWidth="230.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+               <items>
+                  <TreeView id="archiveTree" fx:id="archiveTree" prefHeight="200.0" prefWidth="200.0" />
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <center>
+                        <TextArea fx:id="comment" prefHeight="200.0" prefWidth="200.0" wrapText="true" BorderPane.alignment="CENTER" />
+                     </center>
+                     <top>
+                        <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="230.0" styleClass="default-pane" BorderPane.alignment="CENTER">
+                           <children>
+                              <Label prefHeight="15.0" prefWidth="38.0" text="注释" HBox.hgrow="ALWAYS" />
+                              <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Button id="btnCommentSave" mnemonicParsing="false" onAction="#saveComment" text="存" />
+                                 </children>
+                                 <HBox.margin>
+                                    <Insets right="8.0" />
+                                 </HBox.margin>
+                              </HBox>
+                           </children>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <BorderPane.margin>
+                              <Insets />
+                           </BorderPane.margin>
+                           <padding>
+                              <Insets left="8.0" />
+                           </padding>
+                        </HBox>
+                     </top>
+                  </BorderPane>
+               </items>
+            </SplitPane>
             <TableView id="archiveTable" fx:id="contentTable" prefHeight="200.0" prefWidth="200.0">
               <columns>
                   <TableColumn fx:id="iconColumn" editable="false" prefWidth="47.0" resizable="false" sortable="false" />

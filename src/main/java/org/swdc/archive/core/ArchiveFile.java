@@ -17,6 +17,10 @@ public class ArchiveFile  {
 
     @Getter
     @Setter
+    private String comment;
+
+    @Getter
+    @Setter
     private boolean writeable;
 
     @Getter

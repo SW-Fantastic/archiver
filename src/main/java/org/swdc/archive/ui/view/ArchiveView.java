@@ -32,6 +32,11 @@ public class ArchiveView extends FXView {
         goBack.setFont(fontawsomeService.getFont(FontSize.MIDDLE_SMALL));
         goBack.setPadding(new Insets(4,4,4,4));
         goBack.setText(fontawsomeService.getFontIcon("level_up"));
+
+        Button saveComment = findById("btnCommentSave");
+        saveComment.setFont(fontawsomeService.getFont(FontSize.SMALL));
+        saveComment.setPadding(new Insets(4,4,4,4));
+        saveComment.setText(fontawsomeService.getFontIcon("save"));
         this.createContextMenu();
     }
 

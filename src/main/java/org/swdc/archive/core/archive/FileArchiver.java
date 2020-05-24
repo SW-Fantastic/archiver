@@ -16,6 +16,8 @@ public interface FileArchiver {
 
     void createArchive(File target);
 
+    void saveComment(ArchiveFile file,String data);
+
     void rename(ArchiveFile file, ArchiveEntry target, String newName);
 
     void extractFile(ArchiveFile file, ArchiveEntry entry, File target);

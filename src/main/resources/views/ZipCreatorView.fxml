@@ -49,7 +49,7 @@
                   <Insets left="12.0" top="12.0" />
                </padding>
             </VBox>
-            <ListView prefHeight="200.0" prefWidth="200.0" />
+            <ListView id="filesList" prefHeight="200.0" prefWidth="200.0" />
          </items>
       </SplitPane>
    </center>

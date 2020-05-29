@@ -20,6 +20,13 @@
 .dialog-pane .button:hover {
   -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
 }
+.dialog-pane .button > .label {
+  -fx-background-color: #74a982;
+  -fx-text-fill: #fffcf2;
+}
+.dialog-pane .button .arrow {
+  -fx-background-color: #fffcf2;
+}
 .dialog-pane .text-field {
   -fx-background-color: rgba(255, 255, 255, 0.6);
   -fx-border-width: 0 0 2 0;
@@ -107,10 +114,40 @@
 .scene .view {
   -fx-background-color: rgba(255, 255, 255, 0.4);
 }
+.scene .split-pane {
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .split-pane .split-pane-divider {
+  -fx-background-color: rgba(245, 237, 240, 0.8);
+  -fx-padding: 0 1 0 1;
+}
 .scene .content-view {
   -fx-background-color: rgba(255, 255, 255, 0.6);
   -fx-background-radius: 12;
   -fx-font-size: 13;
+}
+.scene .content-view .combo-box {
+  -fx-border-color: #74a982;
+  -fx-border-style: solid;
+  -fx-border-width: 0 0 1.5 0;
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .content-view .combo-box .list-view {
+  -fx-text-fill: #74a982;
+  -fx-background-color: #fffcf2;
+}
+.scene .content-view .combo-box .list-view .list-cell:selected * {
+  -fx-text-fill: #fffcf2;
+  -fx-background-color: #74a982;
+}
+.scene .content-view .combo-box .list-view .list-cell:hover,
+.scene .content-view .combo-box .list-view .list-cell:focused {
+  -fx-text-fill: #fffcf2;
+  -fx-background-color: #74a982;
+}
+.scene .content-view .combo-box .list-view .list-cell:hover *,
+.scene .content-view .combo-box .list-view .list-cell:focused * {
+  -fx-text-fill: #fffcf2;
 }
 .scene .content-view .btn-block {
   -fx-background-color: #74a982;
@@ -121,6 +158,13 @@
 }
 .scene .content-view .btn-block:hover {
   -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .content-view .btn-block > .label {
+  -fx-background-color: #74a982;
+  -fx-text-fill: #fffcf2;
+}
+.scene .content-view .btn-block .arrow {
+  -fx-background-color: #fffcf2;
 }
 .scene .content-view .btn-no-bg {
   -fx-border-style: dashed;
@@ -139,13 +183,6 @@
   -fx-border-color: #74a982;
   -fx-border-style: solid;
   -fx-text-fill: #74a982;
-}
-.scene .content-view .split-pane {
-  -fx-background-color: rgba(255, 255, 255, 0);
-}
-.scene .content-view .split-pane .split-pane-divider {
-  -fx-background-color: rgba(245, 237, 240, 0.8);
-  -fx-padding: 0 1 0 1;
 }
 .scene .content-view .tree-view {
   -fx-background-color: rgba(255, 255, 255, 0);

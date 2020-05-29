@@ -8,6 +8,7 @@ import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.core.archive.formats.creators.CreatorView;
 import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.view.ProgressView;
 
@@ -64,7 +65,7 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
     }
 
     @Override
-    public void createArchive(File target) {
+    public void create(File target, List<File> files) {
 
     }
 
@@ -149,6 +150,11 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
     }
 
     @Override
+    public Class<? extends CreatorView> getCreator() {
+        return null;
+    }
+
+    @Override
     public void extractFiles(ArchiveFile file, File target) {
         CompletableFuture.runAsync(() -> {
             try {
@@ -208,6 +214,11 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public boolean creatable() {
+        return false;
     }
 
     @Override

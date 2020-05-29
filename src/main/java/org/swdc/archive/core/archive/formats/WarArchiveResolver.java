@@ -11,4 +11,9 @@ public class WarArchiveResolver extends ZipArchiveResolver {
     public String getExtension() {
         return "war";
     }
+
+    @Override
+    public boolean creatable() {
+        return false;
+    }
 }

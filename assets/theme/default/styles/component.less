@@ -7,6 +7,27 @@
   -fx-border-style: solid;
   -fx-text-fill: @border;
 }
+.combo-box(@textColor, @background) {
+  -fx-border-color: @textColor;
+  -fx-border-style: solid;
+  -fx-border-width: 0 0 1.5 0;
+  -fx-background-color: @color-noting;
+  .list-view {
+    -fx-text-fill: @textColor;
+    -fx-background-color: @background;
+    .list-cell:selected *{
+      -fx-text-fill: @background;
+      -fx-background-color: @textColor;
+    }
+    .list-cell:hover,.list-cell:focused{
+      -fx-text-fill: @background;
+      -fx-background-color: @textColor;
+    }
+    .list-cell:hover *,.list-cell:focused *{
+      -fx-text-fill: @background;
+    }
+  }
+}
 
 .scrollable(@color) {
   -fx-background-color: @color-noting;

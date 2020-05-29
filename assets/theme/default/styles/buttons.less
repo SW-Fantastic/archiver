@@ -40,5 +40,12 @@
   &:hover {
     -fx-effect: dropshadow(three-pass-box,@background, 8, 0, 0, 0);
   }
+  & > .label{
+    -fx-background-color: @background;
+    -fx-text-fill: @text;
+  }
+  & .arrow {
+    -fx-background-color: @text;
+  }
 }
 

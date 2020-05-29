@@ -12,7 +12,7 @@
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="12.0" styleClass="content-view" BorderPane.alignment="CENTER">
          <children>
             <Button id="open" mnemonicParsing="false" onAction="#openArchiveFile" prefHeight="64.0" prefWidth="64.0" styleClass="btn-block" text="open" />
-            <Button id="create" layoutX="301.0" layoutY="206.0" mnemonicParsing="false" prefHeight="64.0" prefWidth="64.0" styleClass="btn-block" text="create" />
+            <MenuButton id="create" fx:id="createButton" mnemonicParsing="false" prefHeight="64.0" prefWidth="64.0" styleClass="btn-block" text="create" />
          </children>
          <BorderPane.margin>
             <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />

@@ -1,12 +1,22 @@
 package org.swdc.archive.ui.controller;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
+import org.swdc.archive.core.ArchiveService;
 import org.swdc.archive.core.archive.FileArchiver;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.core.archive.formats.creators.CreatorView;
+import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.view.MainView;
 import org.swdc.fx.FXController;
+import org.swdc.fx.FXView;
+import org.swdc.fx.anno.Aware;
 
 import java.io.File;
 import java.net.URL;
@@ -17,9 +27,33 @@ import java.util.stream.Collectors;
 
 public class StartViewController extends FXController {
 
+    @FXML
+    private MenuButton createButton;
+
+    private ObservableList<MenuItem> creatable = FXCollections.observableArrayList();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        Bindings.bindContentBidirectional(createButton.getItems(),creatable);
+    }
 
+    @Override
+    public void initialize() {
+        List<ArchiveResolver> resolvers = getScoped(ArchiveResolver.class);
+        List<MenuItem> menuItems = resolvers.stream()
+                .filter(FileArchiver::creatable)
+                .map(item ->
+                    UIUtil.createMenuItem("创建" + item.getName(), e->{
+                        if (item.getCreator() == null) {
+                            return;
+                        }
+                        FXView creator = findView(item.getCreator());
+                        creator.show();
+                        item.createArchive((CreatorView) creator);
+                    }))
+                .collect(Collectors.toList());
+        creatable.clear();
+        creatable.addAll(menuItems);
     }
 
     @FXML

@@ -8,6 +8,8 @@ import net.lingala.zip4j.progress.ProgressMonitor;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.core.archive.formats.creators.CreatorView;
+import org.swdc.archive.core.archive.formats.creators.ZipCreatorView;
 import org.swdc.archive.ui.DataUtil;
 import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
@@ -76,6 +78,11 @@ public class ZipArchiveResolver extends ArchiveResolver {
         } catch (Exception e) {
             logger.error("fail to save comment");
         }
+    }
+
+    @Override
+    public boolean creatable() {
+        return true;
     }
 
     private ArchiveEntry resolveEntry(ArchiveFile file, ArchiveEntry root, FileHeader archiveEntry){
@@ -201,8 +208,13 @@ public class ZipArchiveResolver extends ArchiveResolver {
     }
 
     @Override
-    public void createArchive(File target) {
+    public void create(File target, List<File> files) {
 
+    }
+
+    @Override
+    public Class<? extends CreatorView> getCreator() {
+        return ZipCreatorView.class;
     }
 
     @Override

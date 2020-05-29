@@ -10,6 +10,7 @@ import org.apache.commons.compress.archivers.sevenz.*;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.core.archive.formats.creators.CreatorView;
 import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.ProgressView;
@@ -65,6 +66,10 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
         }
     }
 
+    @Override
+    public boolean creatable() {
+        return true;
+    }
 
     @Override
     public void saveComment(ArchiveFile file, String data) {
@@ -361,8 +366,13 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
     }
 
     @Override
-    public void createArchive(File target) {
+    public void create(File target, List<File> files) {
 
+    }
+
+    @Override
+    public Class<? extends CreatorView> getCreator() {
+        return null;
     }
 
     @Override

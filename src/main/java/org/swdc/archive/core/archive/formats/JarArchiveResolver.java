@@ -11,4 +11,9 @@ public class JarArchiveResolver extends ZipArchiveResolver {
     public String getName() {
         return "java 压缩格式";
     }
+
+    @Override
+    public boolean creatable() {
+        return true;
+    }
 }

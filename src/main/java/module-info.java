@@ -21,6 +21,10 @@ module fxArchive {
             javafx.fxml,
             fx.framework.core;
 
+    opens org.swdc.archive.core.archive.formats.creators to
+            javafx.fxml,
+            fx.framework.core;
+
     opens org.swdc.archive.ui.controller to
             javafx.fxml,
             fx.framework.core;

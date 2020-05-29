@@ -3,8 +3,10 @@ package org.swdc.archive.core.archive;
 import javafx.stage.FileChooser;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
+import org.swdc.archive.core.archive.formats.creators.CreatorView;
 
 import java.io.File;
+import java.util.List;
 
 public interface FileArchiver {
 
@@ -14,7 +16,13 @@ public interface FileArchiver {
 
     void removeFile(ArchiveFile target, ArchiveEntry entry);
 
-    void createArchive(File target);
+    default <T extends CreatorView> void createArchive(T view){
+        create(view.getSaveTarget(),view.getFiles());
+    }
+
+    void create(File target,List<File> files);
+
+    Class getCreator();
 
     void saveComment(ArchiveFile file,String data);
 
@@ -31,5 +39,7 @@ public interface FileArchiver {
     FileChooser.ExtensionFilter getFilter();
 
     ArchiveFile loadFile(File file);
+
+    boolean creatable();
 
 }

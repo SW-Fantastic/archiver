@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.MenuItem;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 import org.swdc.archive.ui.view.MessageView;
@@ -29,11 +30,16 @@ public class UIUtil {
         return writer.toString();
     }
 
-    public static void notification(String content, AppComponent scope) {
+    public static void notification(String content, AppComponent scope){
+        notification(content,scope,null);
+    }
+
+    public static void notification(String content, AppComponent scope, Stage owner) {
         Platform.runLater(() -> {
             MessageView msgView = scope.findComponent(MessageView.class);
             msgView.setText(content);
             Notifications.create()
+                    .owner(owner)
                     .graphic(msgView.getView())
                     .position(Pos.CENTER)
                     .hideAfter(Duration.seconds(2))

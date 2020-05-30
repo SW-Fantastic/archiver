@@ -18,6 +18,7 @@ import org.swdc.archive.ui.view.ProgressView;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -213,20 +214,38 @@ public class ZipArchiveResolver extends ArchiveResolver {
         if (target == null || parameters == null || files == null || files.isEmpty()){
             return;
         }
-        try {
-            ZipFile zipFile = new ZipFile(target);
-            Map<Boolean,List<File>> fileList = files.stream().collect(Collectors.groupingBy(File::isDirectory,Collectors.toList()));
-            if (fileList.containsKey(false)) {
-                zipFile.addFiles(fileList.get(false),(ZipParameters) parameters);
-            }
-            if (fileList.containsKey(true)) {
-                for (File folder : fileList.get(true)) {
-                    zipFile.addFolder(folder, (ZipParameters) parameters);
+        CompletableFuture.runAsync(() -> {
+            try {
+                progressView.show();
+                progressView.update("正在索引文件",0);
+                ZipFile zipFile = new ZipFile(target);
+                Map<Boolean,List<File>> fileList = files.stream().collect(Collectors.groupingBy(File::isDirectory,Collectors.toList()));
+
+                if (fileList.containsKey(false)) {
+                    List<File> selectFiles = fileList.get(false);
+                    for (int idx = 0; idx < selectFiles.size(); idx ++) {
+                        File file = fileList.get(false).get(idx);
+                        progressView.update("正在添加：" + file.getName(), (idx + 0.0)/selectFiles.size());
+                        zipFile.addFile(selectFiles.get(idx),(ZipParameters) parameters);
+                    }
                 }
+
+                if (fileList.containsKey(true)) {
+                    List<File> selectFolders = fileList.get(true);
+                    for (int idx = 0; idx < selectFolders.size(); idx ++) {
+                        progressView.update("正在添加文件夹: " +  selectFolders.get(idx).getName(), (idx + 0.0) / selectFolders.size());
+                        zipFile.addFolder(selectFolders.get(idx), (ZipParameters) parameters);
+                    }
+                }
+                progressView.finish();
+                UIUtil.notification("压缩文件创建完成：" + target.getName(),this);
+            } catch (Exception e) {
+                logger.error("fail to create file " ,e);
+                progressView.finish();
+                UIUtil.notification("压缩文件创建失败：" + target.getName(),this);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
+
     }
 
     @Override

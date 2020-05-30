@@ -17,7 +17,6 @@ import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.ProgressView;
 
 import java.io.*;
-import java.lang.reflect.Method;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -373,64 +372,77 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
         if (target == null || param == null || files == null || files.isEmpty()){
             return;
         }
-        SevenZipCompressLevel compressLevel = (SevenZipCompressLevel)param;
-        try {
-            RandomAccessFile file = new RandomAccessFile(target.getAbsolutePath(), "rw");
-            RandomAccessFileOutStream outStream = new RandomAccessFileOutStream(file);
-            IOutCreateArchive7z archive7z = SevenZip.openOutArchive7z();
-            archive7z.setLevel(compressLevel.getLevel());
-            Map<Boolean,List<File>> fileList = files.stream().collect(Collectors.groupingBy(File::isDirectory,Collectors.toList()));
-
-            List<SevenEntry> archiveContent = new ArrayList<>();
-            if (fileList.containsKey(true)) {
-                List<SevenEntry> folderContents = fileList.get(true)
-                        .stream()
-                        .map(folder->{
-                            List<SevenEntry> entries = this.listFolderContent(folder);
-                            for(SevenEntry entry: entries) {
-                                entry.setRelative(folder.getName() + "/" + entry.getRelative());
-                            }
-                            return entries;
-                        })
-                        .flatMap(i->i.stream())
-                        .collect(Collectors.toList());
-                archiveContent.addAll(folderContents);
-            }
-            if (fileList.containsKey(false)) {
-                List<SevenEntry> filesItem = fileList.get(false)
-                        .stream().map(i -> SevenEntry.builder()
-                                .fullPath(i.getAbsolutePath())
-                                .relative(i.getName())
-                                .size(i.length())
-                                .build())
-                        .collect(Collectors.toList());
-                archiveContent.addAll(filesItem);
-            }
-
+        CompletableFuture.runAsync(() -> {
+            progressView.show();
+            progressView.update("正在索引文件",0);
+            SevenZipCompressLevel compressLevel = (SevenZipCompressLevel)param;
             try {
-                archive7z.createArchive(outStream,archiveContent.size(),createOutCallback((idx,factory)-> {
-                    SevenEntry current = archiveContent.get(idx);
-                    IOutItem7z item = (IOutItem7z) factory.createOutItem();
-                    item.setDataSize(current.getSize());
-                    item.setUpdateIsNewData(true);
-                    item.setPropertyIsDir(current.isFolder());
-                    item.setPropertyPath(current.getRelative());
-                    return item;
-                },i -> {
-                    SevenEntry entry = archiveContent.get(i);
-                    if (!entry.isFolder()) {
-                        RandomAccessFile targetFile = new RandomAccessFile(new File(entry.getFullPath()),"r");
-                        return new RandomAccessFileInStream(targetFile);
-                    }
-                    return null;
-                }));
+                RandomAccessFile file = new RandomAccessFile(target.getAbsolutePath(), "rw");
+                RandomAccessFileOutStream outStream = new RandomAccessFileOutStream(file);
+                IOutCreateArchive7z archive7z = SevenZip.openOutArchive7z();
+                archive7z.setLevel(compressLevel.getLevel());
+                Map<Boolean,List<File>> fileList = files.stream().collect(Collectors.groupingBy(File::isDirectory,Collectors.toList()));
+
+                List<SevenEntry> archiveContent = new ArrayList<>();
+                if (fileList.containsKey(true)) {
+                    List<SevenEntry> folderContents = fileList.get(true)
+                            .stream()
+                            .map(folder->{
+                                List<SevenEntry> entries = this.listFolderContent(folder);
+                                for(SevenEntry entry: entries) {
+                                    entry.setRelative(folder.getName() + "/" + entry.getRelative());
+                                }
+                                return entries;
+                            })
+                            .flatMap(i->i.stream())
+                            .collect(Collectors.toList());
+                    archiveContent.addAll(folderContents);
+                }
+                if (fileList.containsKey(false)) {
+                    List<SevenEntry> filesItem = fileList.get(false)
+                            .stream().map(i -> SevenEntry.builder()
+                                    .fullPath(i.getAbsolutePath())
+                                    .relative(i.getName())
+                                    .size(i.length())
+                                    .build())
+                            .collect(Collectors.toList());
+                    archiveContent.addAll(filesItem);
+                }
+
+                try {
+                    progressView.update("正在开始",0);
+                    int count = archiveContent.size();
+                    archive7z.createArchive(outStream,archiveContent.size(),createOutCallback((idx,factory)-> {
+                        SevenEntry current = archiveContent.get(idx);
+                        IOutItem7z item = (IOutItem7z) factory.createOutItem();
+                        item.setDataSize(current.getSize());
+                        item.setUpdateIsNewData(true);
+                        item.setPropertyIsDir(current.isFolder());
+                        item.setPropertyPath(current.getRelative());
+                        return item;
+                    },i -> {
+                        SevenEntry entry = archiveContent.get(i);
+                        progressView.update("正在添加：" + entry.getRelative(), (i + 0.0)/count);
+                        if (!entry.isFolder()) {
+                            RandomAccessFile targetFile = new RandomAccessFile(new File(entry.getFullPath()),"r");
+                            return new RandomAccessFileInStream(targetFile);
+                        }
+                        return null;
+                    }));
+                    progressView.finish();
+                    UIUtil.notification("压缩文件已经创建：" + target.getName(),this);
+                } catch (Exception e) {
+                    progressView.finish();
+                    logger.error("fail to add some file", e);
+                    UIUtil.notification("压缩文件创建失败：" + target.getName(),this);
+                }
+                closeAllResources(archive7z,outStream,file);
             } catch (Exception e) {
-                logger.error("fail to add some file", e);
+                progressView.finish();
+                UIUtil.notification("压缩文件创建失败：" + target.getName(),this);
+                logger.error("fail to create file",e);
             }
-            closeAllResources(archive7z,outStream,file);
-        } catch (Exception e) {
-            logger.error("fail to create file",e);
-        }
+        });
     }
 
     @Override

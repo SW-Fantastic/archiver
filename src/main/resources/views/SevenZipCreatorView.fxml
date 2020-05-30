@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="385.0" prefWidth="572.0" styleClass="scene" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swdc.archive.core.archive.formats.creators.SevenZipCreatorController">
+   <center>
+      <SplitPane dividerPositions="0.3651376146788991" prefHeight="200.0" prefWidth="200.0" styleClass="content-view" BorderPane.alignment="CENTER">
+         <items>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0">
+               <padding>
+                  <Insets left="12.0" top="12.0" />
+               </padding>
+               <children>
+                  <Label text="压缩等级：" />
+                  <ComboBox fx:id="cbxArchiveLevel" prefHeight="23.0" prefWidth="169.0" />
+               </children>
+            </VBox>
+            <ListView id="filesList" fx:id="fileListView" prefHeight="200.0" prefWidth="200.0" />
+         </items>
+      </SplitPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" prefHeight="54.0" prefWidth="547.0" spacing="8.0" styleClass="content-view" BorderPane.alignment="TOP_LEFT">
+         <padding>
+            <Insets right="12.0" />
+         </padding>
+         <children>
+            <Button mnemonicParsing="false" onAction="#onCancel" prefHeight="32.0" prefWidth="84.0" styleClass="btn-block" text="取消" />
+            <Button layoutX="480.0" layoutY="20.0" mnemonicParsing="false" onAction="#onCreate" prefHeight="32.0" prefWidth="84.0" styleClass="btn-block" text="创建" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

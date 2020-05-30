@@ -19,6 +19,19 @@ public interface SevenZipSupport extends LifeCircle {
     String sevenZipModuleName = "sevenzipjbinding.all.platforms";
     String sevenZipLibDesc = "sevenzipjbinding-lib.properties";
 
+    enum SevenZipCompressLevel {
+        NORMAL(5), FAST(3), FASTEST(1), MAXIMUM(7), STORE(0);
+        private int level;
+        SevenZipCompressLevel(int level) {
+            this.level = level;
+        }
+
+        public int getLevel() {
+            return level;
+        }
+
+    }
+
     /**
      * 根据index，返回一个7z的文件描述对象
      */

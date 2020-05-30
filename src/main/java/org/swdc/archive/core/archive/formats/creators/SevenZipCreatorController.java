@@ -9,9 +9,8 @@ import javafx.scene.control.ListView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import lombok.Getter;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.model.enums.CompressionLevel;
-import net.lingala.zip4j.model.enums.CompressionMethod;
+import org.swdc.archive.core.archive.formats.SevenZArchiveResolver;
+import org.swdc.archive.core.archive.formats.SevenZipSupport;
 import org.swdc.archive.core.archive.formats.ZipArchiveResolver;
 import org.swdc.archive.ui.view.cells.PropertyListCell;
 import org.swdc.fx.FXController;
@@ -21,10 +20,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class ZipCreatorController extends FXController {
+public class SevenZipCreatorController extends FXController {
 
-    @FXML
-    private ComboBox<String> cbxCompressMethod;
+    @Getter
+    private File saveTarget;
 
     @FXML
     private ComboBox<String> cbxArchiveLevel;
@@ -35,21 +34,16 @@ public class ZipCreatorController extends FXController {
     @Getter
     private ObservableList<File> files = FXCollections.observableArrayList();
 
-    @Getter
-    private File saveTarget = null;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        cbxCompressMethod.getItems().addAll("DEFLATE","STORE");
-        cbxCompressMethod.getSelectionModel().select(0);
-        cbxArchiveLevel.getItems().addAll("FAST","FASTEST","MAXIMUM","NORMAL","ULTRA");
+        cbxArchiveLevel.getItems().addAll("NORMAL","FAST","FASTEST","MAXIMUM","STORE");
         cbxArchiveLevel.getSelectionModel().select("NORMAL");
         fileListView.setItems(files);
         fileListView.setCellFactory((lv) -> new PropertyListCell<>("name",File.class));
     }
 
     protected void addFile(ActionEvent event) {
-        ZipCreatorView view = getView();
+        SevenZipCreatorView view = getView();
         FileChooser chooser = new FileChooser();
         chooser.setTitle("添加文件");
         List<File> files = chooser.showOpenMultipleDialog(view.getStage());
@@ -59,7 +53,7 @@ public class ZipCreatorController extends FXController {
     }
 
     protected void addFolder(ActionEvent event) {
-        ZipCreatorView view = getView();
+        SevenZipCreatorView view = getView();
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("添加文件夹");
         File folder = directoryChooser.showDialog(view.getStage());
@@ -75,17 +69,17 @@ public class ZipCreatorController extends FXController {
         }
     }
 
-    public ZipParameters getParam() {
-        ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(CompressionMethod.valueOf(cbxCompressMethod.getSelectionModel().getSelectedItem()));
-        parameters.setCompressionLevel(CompressionLevel.valueOf(cbxArchiveLevel.getSelectionModel().getSelectedItem()));
-        return parameters;
+    @FXML
+    public void onCancel() {
+        saveTarget = null;
+        SevenZipCreatorView view = getView();
+        view.close();
     }
 
     @FXML
     public void onCreate() {
-        ZipCreatorView view = getView();
-        ZipArchiveResolver resolver = findComponent(ZipArchiveResolver.class);
+        SevenZipCreatorView view = getView();
+        SevenZArchiveResolver resolver = findComponent(SevenZArchiveResolver.class);
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(resolver.getFilter());
         chooser.setSelectedExtensionFilter(resolver.getFilter());
@@ -97,11 +91,7 @@ public class ZipCreatorController extends FXController {
         }
     }
 
-    @FXML
-    public void onCancel() {
-        ZipCreatorView view = getView();
-        saveTarget = null;
-        view.close();
+    public SevenZipSupport.SevenZipCompressLevel getArchiveLevel() {
+        return SevenZipSupport.SevenZipCompressLevel.valueOf(cbxArchiveLevel.getSelectionModel().getSelectedItem());
     }
-
 }

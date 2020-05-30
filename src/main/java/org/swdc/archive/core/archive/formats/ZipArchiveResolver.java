@@ -216,9 +216,13 @@ public class ZipArchiveResolver extends ArchiveResolver {
         try {
             ZipFile zipFile = new ZipFile(target);
             Map<Boolean,List<File>> fileList = files.stream().collect(Collectors.groupingBy(File::isDirectory,Collectors.toList()));
-            zipFile.addFiles(fileList.get(false),(ZipParameters) parameters);
-            for (File folder : fileList.get(true)) {
-                zipFile.addFolder(folder, (ZipParameters) parameters);
+            if (fileList.containsKey(false)) {
+                zipFile.addFiles(fileList.get(false),(ZipParameters) parameters);
+            }
+            if (fileList.containsKey(true)) {
+                for (File folder : fileList.get(true)) {
+                    zipFile.addFolder(folder, (ZipParameters) parameters);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

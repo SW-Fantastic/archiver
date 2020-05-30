@@ -14,6 +14,6 @@ public class JarArchiveResolver extends ZipArchiveResolver {
 
     @Override
     public boolean creatable() {
-        return true;
+        return false;
     }
 }

@@ -17,10 +17,10 @@ public interface FileArchiver {
     void removeFile(ArchiveFile target, ArchiveEntry entry);
 
     default <T extends CreatorView> void createArchive(T view){
-        create(view.getSaveTarget(),view.getFiles());
+        create(view.getSaveTarget(),view.getFiles(),view.getCreateParameters());
     }
 
-    void create(File target,List<File> files);
+    void create(File target,List<File> files, Object param);
 
     Class getCreator();
 

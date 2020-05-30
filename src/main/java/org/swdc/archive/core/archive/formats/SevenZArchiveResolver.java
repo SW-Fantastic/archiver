@@ -366,7 +366,7 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
     }
 
     @Override
-    public void create(File target, List<File> files) {
+    public void create(File target, List<File> files, Object param) {
 
     }
 

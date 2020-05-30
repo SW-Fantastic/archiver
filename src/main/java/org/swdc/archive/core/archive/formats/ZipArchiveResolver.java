@@ -19,6 +19,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ZipArchiveResolver extends ArchiveResolver {
 
@@ -208,8 +209,20 @@ public class ZipArchiveResolver extends ArchiveResolver {
     }
 
     @Override
-    public void create(File target, List<File> files) {
-
+    public void create(File target, List<File> files,Object parameters) {
+        if (target == null || parameters == null || files == null || files.isEmpty()){
+            return;
+        }
+        try {
+            ZipFile zipFile = new ZipFile(target);
+            Map<Boolean,List<File>> fileList = files.stream().collect(Collectors.groupingBy(File::isDirectory,Collectors.toList()));
+            zipFile.addFiles(fileList.get(false),(ZipParameters) parameters);
+            for (File folder : fileList.get(true)) {
+                zipFile.addFolder(folder, (ZipParameters) parameters);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

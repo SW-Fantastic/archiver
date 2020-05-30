@@ -7,49 +7,26 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="552.0" styleClass="scene" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swdc.archive.core.archive.formats.creators.ZipCreatorController">
-   <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="552.0" spacing="8.0" styleClass="content-view" BorderPane.alignment="CENTER">
-         <padding>
-            <Insets left="12.0" />
-         </padding>
-         <children>
-            <Label text="保存到：">
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </Label>
-            <TextField prefHeight="27.0" prefWidth="78.0" HBox.hgrow="ALWAYS">
-               <HBox.margin>
-                  <Insets left="8.0" />
-               </HBox.margin>
-            </TextField>
-            <Button id="btn-folder" mnemonicParsing="false" prefHeight="32.0" prefWidth="32.0" styleClass="btn-no-bg" text="改">
-               <HBox.margin>
-                  <Insets right="12.0" />
-               </HBox.margin>
-            </Button>
-         </children>
-      </HBox>
-   </top>
    <center>
       <SplitPane dividerPositions="0.39090909090909093" prefHeight="200.0" prefWidth="200.0" styleClass="content-view" BorderPane.alignment="CENTER">
          <items>
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0">
                <children>
-                  <Label text="压缩等级：">
+                  <Label text="压缩方式：">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
                   </Label>
+                  <ComboBox fx:id="cbxCompressMethod" prefHeight="25.0" prefWidth="169.0" />
+                  <Label text="压缩等级：" />
                   <ComboBox fx:id="cbxArchiveLevel" prefHeight="25.0" prefWidth="169.0" />
                </children>
                <padding>
                   <Insets left="12.0" top="12.0" />
                </padding>
             </VBox>
-            <ListView id="filesList" prefHeight="200.0" prefWidth="200.0" />
+            <ListView id="filesList" fx:id="fileListView" prefHeight="200.0" prefWidth="200.0" />
          </items>
       </SplitPane>
    </center>
@@ -59,8 +36,8 @@
             <Insets right="12.0" />
          </BorderPane.margin>
          <children>
-            <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="82.0" styleClass="btn-block" text="取消" />
-            <Button layoutX="468.0" layoutY="23.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="82.0" styleClass="btn-block" text="创建" />
+            <Button mnemonicParsing="false" onAction="#onCancel" prefHeight="30.0" prefWidth="82.0" styleClass="btn-block" text="取消" />
+            <Button layoutX="468.0" layoutY="23.0" mnemonicParsing="false" onAction="#onCreate" prefHeight="30.0" prefWidth="82.0" styleClass="btn-block" text="创建" />
          </children>
       </HBox>
    </bottom>

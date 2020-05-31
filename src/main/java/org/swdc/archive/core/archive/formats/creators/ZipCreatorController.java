@@ -4,15 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import lombok.Getter;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.CompressionLevel;
 import net.lingala.zip4j.model.enums.CompressionMethod;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
 import org.swdc.archive.core.archive.formats.ZipArchiveResolver;
+import org.swdc.archive.core.archive.formats.ZipParam;
+import org.swdc.archive.ui.DataUtil;
+import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.view.cells.PropertyListCell;
 import org.swdc.fx.FXController;
 
@@ -32,6 +35,21 @@ public class ZipCreatorController extends FXController {
     @FXML
     private ListView<File> fileListView;
 
+    @FXML
+    private TextField txtSize;
+
+    @FXML
+    private Label lblSize;
+
+    @FXML
+    private CheckBox chkSplit;
+
+    @FXML
+    private PasswordField txtPassword;
+
+    @FXML
+    private CheckBox cbxPassword;
+
     @Getter
     private ObservableList<File> files = FXCollections.observableArrayList();
 
@@ -46,6 +64,15 @@ public class ZipCreatorController extends FXController {
         cbxArchiveLevel.getSelectionModel().select("NORMAL");
         fileListView.setItems(files);
         fileListView.setCellFactory((lv) -> new PropertyListCell<>("name",File.class));
+        txtSize.textProperty().addListener(o -> {
+            String text = txtSize.getText();
+            try {
+                Long size = Long.parseLong(text);
+                lblSize.setText(DataUtil.getFileSize(size));
+            }catch (Exception e){
+                lblSize.setText("无效");
+            }
+        });
     }
 
     protected void addFile(ActionEvent event) {
@@ -75,11 +102,38 @@ public class ZipCreatorController extends FXController {
         }
     }
 
-    public ZipParameters getParam() {
+    public ZipParam getParam() {
+        ZipParam param = new ZipParam();
+
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(CompressionMethod.valueOf(cbxCompressMethod.getSelectionModel().getSelectedItem()));
         parameters.setCompressionLevel(CompressionLevel.valueOf(cbxArchiveLevel.getSelectionModel().getSelectedItem()));
-        return parameters;
+
+        if (cbxPassword.isSelected()) {
+            if (!txtPassword.getText().isBlank()) {
+                parameters.setEncryptFiles(true);
+                parameters.setEncryptionMethod(EncryptionMethod.AES);
+                param.setPassword(txtPassword.getText().toCharArray());
+            }
+        }
+
+        param.setParameters(parameters);
+        if (chkSplit.isSelected()) {
+            try {
+                Long size = Long.parseLong(txtSize.getText());
+                if (size < 65536) {
+                    UIUtil.notification("分卷压缩的分卷大小不能小于65536.",this);
+                } else {
+                    param.setCreateSplit(true);
+                    param.setSplitSize(size);
+                }
+            } catch (Exception e) {
+                UIUtil.notification("分卷压缩的分卷大小不能小于65536.",this);
+            }
+        }
+
+
+        return param;
     }
 
     @FXML

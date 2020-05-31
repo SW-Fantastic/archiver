@@ -5,6 +5,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import net.lingala.zip4j.model.ZipParameters;
+import org.swdc.archive.core.archive.formats.ZipParam;
 import org.swdc.archive.ui.UIUtil;
 import org.swdc.fx.FXView;
 import org.swdc.fx.anno.Scope;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @Scope(ScopeType.MULTI)
 @View(title = "创建ZIP文件",dialog = true,background = true)
-public class ZipCreatorView extends FXView implements CreatorView<ZipParameters> {
+public class ZipCreatorView extends FXView implements CreatorView<ZipParam> {
 
     @Override
     public void initialize() {
@@ -50,7 +51,7 @@ public class ZipCreatorView extends FXView implements CreatorView<ZipParameters>
     }
 
     @Override
-    public ZipParameters getCreateParameters() {
+    public ZipParam getCreateParameters() {
         ZipCreatorController creatorController = this.getLoader().getController();
         return creatorController.getParam();
     }

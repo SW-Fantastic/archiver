@@ -7,9 +7,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="552.0" styleClass="scene" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swdc.archive.core.archive.formats.creators.ZipCreatorController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="633.0" styleClass="scene" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swdc.archive.core.archive.formats.creators.ZipCreatorController">
    <center>
-      <SplitPane dividerPositions="0.39090909090909093" prefHeight="200.0" prefWidth="200.0" styleClass="content-view" BorderPane.alignment="CENTER">
+      <SplitPane dividerPositions="0.3549920760697306" prefHeight="200.0" prefWidth="200.0" styleClass="content-view" BorderPane.alignment="CENTER">
          <items>
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0">
                <children>
@@ -21,6 +21,21 @@
                   <ComboBox fx:id="cbxCompressMethod" prefHeight="25.0" prefWidth="169.0" />
                   <Label text="压缩等级：" />
                   <ComboBox fx:id="cbxArchiveLevel" prefHeight="25.0" prefWidth="169.0" />
+                  <Label text="分卷：" />
+                  <CheckBox fx:id="chkSplit" mnemonicParsing="false" text="创建分卷压缩" />
+                  <HBox alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="212.0" spacing="8.0">
+                     <children>
+                        <TextField fx:id="txtSize" prefHeight="28.0" prefWidth="153.0" promptText="输入分卷大小" />
+                        <Label fx:id="lblSize" text="0.0" />
+                     </children>
+                  </HBox>
+                  <Label text="加密：" />
+                  <CheckBox fx:id="cbxPassword" mnemonicParsing="false" text="加密以保护文件" />
+                  <PasswordField fx:id="txtPassword" prefHeight="28.0" prefWidth="210.0" promptText="输入密码">
+                     <VBox.margin>
+                        <Insets right="12.0" />
+                     </VBox.margin>
+                  </PasswordField>
                </children>
                <padding>
                   <Insets left="12.0" top="12.0" />

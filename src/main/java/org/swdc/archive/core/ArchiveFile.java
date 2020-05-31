@@ -3,6 +3,7 @@ package org.swdc.archive.core;
 import lombok.Getter;
 import lombok.Setter;
 import net.lingala.zip4j.ZipFile;
+import org.swdc.fx.anno.Scope;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -11,9 +12,13 @@ public class ArchiveFile  {
 
     private File file;
 
-    private ArchiveEntry root= null;
+    private ArchiveEntry root = null;
 
     private Charset charset = Charset.defaultCharset();
+
+    @Getter
+    @Setter
+    private String password = null;
 
     @Getter
     @Setter

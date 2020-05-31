@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -31,7 +32,15 @@ public class UIUtil {
     }
 
     public static void notification(String content, AppComponent scope){
-        notification(content,scope,null);
+        try {
+            notification(content,scope,null);
+        } catch (Exception ignore) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(null);
+            alert.setContentText(content);
+            alert.setTitle("提示");
+            alert.showAndWait();
+        }
     }
 
     public static void notification(String content, AppComponent scope, Stage owner) {

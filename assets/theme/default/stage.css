@@ -126,6 +126,14 @@
   -fx-background-radius: 12;
   -fx-font-size: 13;
 }
+.scene .content-view .check-box .box {
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-border-color: #55917f;
+}
+.scene .content-view .check-box:selected .mark {
+  -fx-background-color: #55917f;
+  -fx-effect: dropshadow(three-pass-box, #55917f, 8, 0, 0, 0);
+}
 .scene .content-view .combo-box {
   -fx-border-color: #74a982;
   -fx-border-style: solid;

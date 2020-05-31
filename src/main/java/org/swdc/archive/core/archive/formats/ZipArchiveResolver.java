@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
 import net.lingala.zip4j.progress.ProgressMonitor;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
@@ -12,8 +13,10 @@ import org.swdc.archive.core.archive.formats.creators.CreatorView;
 import org.swdc.archive.core.archive.formats.creators.ZipCreatorView;
 import org.swdc.archive.ui.DataUtil;
 import org.swdc.archive.ui.UIUtil;
+import org.swdc.archive.ui.controller.dialog.PasswordViewController;
 import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.ProgressView;
+import org.swdc.archive.ui.view.dialog.PasswordView;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -26,10 +29,13 @@ public class ZipArchiveResolver extends ArchiveResolver {
 
     private ProgressView progressView = null;
 
+    private PasswordView passwordView = null;
+
     @Override
     public void initialize() {
         Platform.runLater(() -> {
             this.progressView = findView(ProgressView.class);
+            this.passwordView = findView(PasswordView.class);
         });
     }
 
@@ -42,11 +48,11 @@ public class ZipArchiveResolver extends ArchiveResolver {
             progressView.update("读取文件编码格式：" + charset.name(),10);
             ArchiveFile zipArchiveFile = new ArchiveFile(file);
             zipArchiveFile.setCharset(charset);
-            zipArchiveFile.setWriteable(true);
 
             ZipFile zipFile = new ZipFile(file);
             zipFile.setCharset(charset);
             zipArchiveFile.setComment(zipFile.getComment());
+            zipArchiveFile.setWriteable(!zipFile.isSplitArchive());
             progressView.update("验证压缩文件：" + file.getName(), 20);
             if (!zipFile.isValidZipFile()) {
                 progressView.finish();
@@ -134,11 +140,16 @@ public class ZipArchiveResolver extends ArchiveResolver {
         }
         try {
             ZipParameters parameters = new ZipParameters();
+            if (target.isEncrypted()) {
+                parameters.setEncryptionMethod(EncryptionMethod.AES);
+                parameters.setEncryptFiles(true);
+                zipFile.setPassword(target.getPassword().toCharArray());
+            }
             String path = position.getPath();
             path = path.substring(1, path.length() - 1);
             parameters.setRootFolderNameInZip(path);
             ProgressMonitor monitor = zipFile.getProgressMonitor();
-            Thread progressor = getProgressThread("正在添加", monitor, (rst) -> {
+            Thread progressor = getProgressThread(target,"正在添加", monitor, (rst) -> {
                 try {
                     List<FileHeader> headers = zipFile.getFileHeaders();
                     for (FileHeader header: headers) {
@@ -168,11 +179,19 @@ public class ZipArchiveResolver extends ArchiveResolver {
         if (!entry.isDictionary()) {
             entry = entry.getParent();
         }
+
         String parent = entry.getPath();
         String name = parent.substring(1);
         ZipParameters parameters = new ZipParameters();
         parameters.setRootFolderNameInZip(name);
         parameters.setOverrideExistingFilesInZip(true);
+
+        if (target.isEncrypted()) {
+            parameters.setEncryptionMethod(EncryptionMethod.AES);
+            parameters.setEncryptFiles(true);
+            zipFile.setPassword(target.getPassword().toCharArray());
+        }
+
         try {
             zipFile.addFile(file,parameters);
             ArchiveEntry created = new ArchiveEntry();
@@ -199,6 +218,9 @@ public class ZipArchiveResolver extends ArchiveResolver {
             if (header == null) {
                 return;
             }
+            if (target.isEncrypted()) {
+                zipFile.setPassword(target.getPassword().toCharArray());
+            }
             zipFile.removeFile(header);
             removeEntry(target.getRootEntry(),entry);
             this.emit(new ViewRefreshEvent(entry,this));
@@ -219,14 +241,23 @@ public class ZipArchiveResolver extends ArchiveResolver {
                 progressView.show();
                 progressView.update("正在索引文件",0);
                 ZipFile zipFile = new ZipFile(target);
+                ZipParam param = (ZipParam)parameters;
                 Map<Boolean,List<File>> fileList = files.stream().collect(Collectors.groupingBy(File::isDirectory,Collectors.toList()));
+
+                if (param.getParameters().isEncryptFiles()) {
+                    zipFile.setPassword(param.getPassword());
+                }
 
                 if (fileList.containsKey(false)) {
                     List<File> selectFiles = fileList.get(false);
                     for (int idx = 0; idx < selectFiles.size(); idx ++) {
                         File file = fileList.get(false).get(idx);
                         progressView.update("正在添加：" + file.getName(), (idx + 0.0)/selectFiles.size());
-                        zipFile.addFile(selectFiles.get(idx),(ZipParameters) parameters);
+                        if (param.isCreateSplit()) {
+                            zipFile.createSplitZipFile(List.of(selectFiles.get(idx)),param.getParameters(),true,param.getSplitSize());
+                        } else {
+                            zipFile.addFile(selectFiles.get(idx),param.getParameters());
+                        }
                     }
                 }
 
@@ -234,7 +265,11 @@ public class ZipArchiveResolver extends ArchiveResolver {
                     List<File> selectFolders = fileList.get(true);
                     for (int idx = 0; idx < selectFolders.size(); idx ++) {
                         progressView.update("正在添加文件夹: " +  selectFolders.get(idx).getName(), (idx + 0.0) / selectFolders.size());
-                        zipFile.addFolder(selectFolders.get(idx), (ZipParameters) parameters);
+                        if (param.isCreateSplit()) {
+                            zipFile.createSplitZipFileFromFolder(selectFolders.get(idx),param.getParameters(),true,param.getSplitSize());
+                        } else {
+                            zipFile.addFolder(selectFolders.get(idx), param.getParameters());
+                        }
                     }
                 }
                 progressView.finish();
@@ -264,6 +299,9 @@ public class ZipArchiveResolver extends ArchiveResolver {
                 return;
             }
             String renamedPath = headerName.replace(target.getFileName(), newName);
+            if (zipFile.isEncrypted()) {
+                zipFile.setPassword(file.getPassword().toCharArray());
+            }
             zipFile.renameFile(header,renamedPath);
             target.setFileName(newName);
             this.emit(new ViewRefreshEvent(target,this));
@@ -282,11 +320,14 @@ public class ZipArchiveResolver extends ArchiveResolver {
         try {
             ZipFile zipFile = new ZipFile(file.getFile());
             zipFile.setCharset(file.getCharset());
+            if (file.isEncrypted()) {
+                zipFile.setPassword(file.getPassword().toCharArray());
+            }
             ProgressMonitor monitor = zipFile.getProgressMonitor();
             if (!cascade) {
                 progressView.show();
             }
-            Thread proc = getProgressThread("正在解压文件",monitor,null);
+            Thread proc = getProgressThread(file,"正在解压文件",monitor,null);
             if(!entry.isDictionary()) {
                 FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
                 if (header == null && !cascade){
@@ -320,7 +361,7 @@ public class ZipArchiveResolver extends ArchiveResolver {
         try {
             progressView.show();
             ProgressMonitor monitor = zipFile.getProgressMonitor();
-            Thread prog = getProgressThread("正在解压", monitor,null);
+            Thread prog = getProgressThread(file,"正在解压", monitor,null);
             prog.start();
             zipFile.setRunInThread(true);
             zipFile.extractAll(target.getAbsolutePath());
@@ -330,10 +371,20 @@ public class ZipArchiveResolver extends ArchiveResolver {
         }
     }
 
-    private Thread getProgressThread(String message, ProgressMonitor monitor, Consumer<Void> next) {
+    private Thread getProgressThread(ArchiveFile file,String message, ProgressMonitor monitor, Consumer<Void> next) {
         return new Thread(() -> {
             try {
                 while (monitor.getPercentDone() < 100) {
+                    Exception exception = monitor.getException();
+                    if (monitor.getException() != null) {
+                        progressView.finish();
+                        UIUtil.notification("操作失败。", this);
+                        logger.error("fail to operation",exception);
+                        if (file.isEncrypted()) {
+                            file.setPassword(null);
+                        }
+                        break;
+                    }
                     Thread.sleep(500);
                     String name = monitor.getFileName();
                     progressView.update(message + " : " + name, monitor.getPercentDone() / 100.0);

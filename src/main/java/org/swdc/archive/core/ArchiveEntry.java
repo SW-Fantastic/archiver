@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import lombok.Getter;
 import lombok.Setter;
+import org.swdc.archive.ui.DataUtil;
 import org.swdc.fx.AppComponent;
 import org.swdc.fx.resource.icons.FontSize;
 import org.swdc.fx.resource.icons.FontawsomeService;
@@ -53,21 +54,7 @@ public class ArchiveEntry {
     private TreeItem<ArchiveEntry> treeItem;
 
     public String getFileSize() {
-        if (getSize() == null) {
-            return "";
-        }
-        DecimalFormat df = new DecimalFormat("#.00");
-        String fileSizeString = "";
-        if (this.getSize() < 1024) {
-            fileSizeString = df.format((double) getSize()) + "B";
-        } else if (this.getSize() < 1048576) {
-            fileSizeString = df.format((double) this.getSize() / 1024) + "K";
-        } else if (this.getSize() < 1073741824) {
-            fileSizeString = df.format((double) this.getSize() / 1048576) + "M";
-        } else {
-            fileSizeString = df.format((double) getSize() / 1073741824) + "G";
-        }
-        return fileSizeString;
+        return DataUtil.getFileSize(getSize());
     }
 
     /**

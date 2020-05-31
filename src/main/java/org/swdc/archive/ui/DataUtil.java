@@ -6,6 +6,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 
 public class DataUtil {
 
@@ -25,6 +26,24 @@ public class DataUtil {
         detector.add(JChardetFacade.getInstance());
         detector.add(ASCIIDetector.getInstance());
         return detector;
+    }
+
+    public static String getFileSize(Long size) {
+        if (size == null) {
+            return "";
+        }
+        DecimalFormat df = new DecimalFormat("#.00");
+        String fileSizeString = "";
+        if (size < 1024) {
+            fileSizeString = df.format((double)size) + "B";
+        } else if (size < 1048576) {
+            fileSizeString = df.format((double) size / 1024) + "K";
+        } else if (size < 1073741824) {
+            fileSizeString = df.format((double) size / 1048576) + "M";
+        } else {
+            fileSizeString = df.format((double) size / 1073741824) + "G";
+        }
+        return fileSizeString;
     }
 
 }

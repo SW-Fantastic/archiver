@@ -5,10 +5,20 @@ import info.monitorenter.cpdetector.io.*;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 
 public class DataUtil {
+
+    public static Charset getCharset(InputStream in) {
+        CodepageDetectorProxy detectorProxy = getCodePageDetector();
+        try(BufferedInputStream bufferedInputStream = new BufferedInputStream(in)) {
+            return detectorProxy.detectCodepage(bufferedInputStream, 64);
+        } catch (Exception e) {
+            return Charset.defaultCharset();
+        }
+    }
 
     public static Charset getCharset(File file) {
         CodepageDetectorProxy detectorProxy = getCodePageDetector();

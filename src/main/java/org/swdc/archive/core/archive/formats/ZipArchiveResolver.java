@@ -6,6 +6,10 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
 import net.lingala.zip4j.progress.ProgressMonitor;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
@@ -18,7 +22,11 @@ import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.ProgressView;
 import org.swdc.archive.ui.view.dialog.PasswordView;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -51,14 +59,14 @@ public class ZipArchiveResolver extends ArchiveResolver {
 
             ZipFile zipFile = new ZipFile(file);
             zipFile.setCharset(charset);
-            zipArchiveFile.setComment(zipFile.getComment());
-            zipArchiveFile.setWriteable(!zipFile.isSplitArchive());
             progressView.update("验证压缩文件：" + file.getName(), 20);
             if (!zipFile.isValidZipFile()) {
                 progressView.finish();
                 UIUtil.notification("无法打开文件：" + file.getName() + "，他不是一个有效的zip压缩文件。",this);
                 return null;
             }
+            zipArchiveFile.setComment(zipFile.getComment());
+            zipArchiveFile.setWriteable(!zipFile.isSplitArchive());
             ArchiveEntry rootEntry = new ArchiveEntry();
             rootEntry.setFileName("/");
             rootEntry.setFile(zipArchiveFile);
@@ -74,6 +82,8 @@ public class ZipArchiveResolver extends ArchiveResolver {
             return zipArchiveFile;
         } catch (Exception e){
             logger.error("fail to load ZipFile: ",e);
+            progressView.finish();
+            UIUtil.notification("读取文件失败，不是一个有效的zip压缩文件", this);
             return null;
         }
     }
@@ -308,6 +318,55 @@ public class ZipArchiveResolver extends ArchiveResolver {
         } catch (Exception e) {
             UIUtil.notification("文件重命名失败: \n" + UIUtil.exceptionToString(e), this);
             logger.error("fail to rename file or folder", e);
+        }
+    }
+
+    @Override
+    public ByteBuffer getContent(ArchiveFile file, ArchiveEntry entry) {
+        if (entry.isDictionary()) {
+            return null;
+        }
+        try {
+            ZipFile zipFile = new ZipFile(file.getFile());
+            if (zipFile.isEncrypted()) {
+                zipFile.setPassword(file.getPassword().toCharArray());
+            }
+            zipFile.setCharset(file.getCharset());
+            FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
+            InputStream in = zipFile.getInputStream(header);
+            ByteBuffer data = ByteBuffer.wrap(in.readAllBytes());
+            in.close();
+            return data;
+        } catch (Exception e) {
+            logger.error("fail to read content");
+            return null;
+        }
+    }
+
+    @Override
+    public String getMime(ArchiveFile file, ArchiveEntry entry) {
+        if (entry.isDictionary()) {
+            return null;
+        }
+        try {
+            TikaConfig config = TikaConfig.getDefaultConfig();
+            Detector detector = config.getDetector();
+            Metadata metadata = new Metadata();
+            metadata.add(Metadata.RESOURCE_NAME_KEY, entry.getFileName());
+
+            ZipFile zipFile = new ZipFile(file.getFile());
+            if (zipFile.isEncrypted()) {
+                zipFile.setPassword(file.getPassword().toCharArray());
+            }
+            zipFile.setCharset(file.getCharset());
+            FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
+            InputStream in = new BufferedInputStream(zipFile.getInputStream(header));
+            MediaType type = detector.detect(in,metadata);
+            in.close();
+            return type.toString();
+        } catch (Exception e) {
+            logger.error("fail to read mime");
+            return null;
         }
     }
 

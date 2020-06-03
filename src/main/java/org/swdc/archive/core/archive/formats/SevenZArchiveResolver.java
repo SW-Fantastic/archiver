@@ -17,6 +17,7 @@ import org.swdc.archive.ui.events.ViewRefreshEvent;
 import org.swdc.archive.ui.view.ProgressView;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -265,6 +266,11 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
                 progressView.finish();
             }
         });
+    }
+
+    @Override
+    public ByteBuffer getContent(ArchiveFile file, ArchiveEntry entry) {
+        return null;
     }
 
     @Override

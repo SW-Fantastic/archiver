@@ -17,6 +17,7 @@ import static org.swdc.archive.core.archive.formats.SevenZipSupport.createExtrac
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +48,11 @@ public class RarArchiveResolver extends ArchiveResolver implements SevenZipSuppo
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public ByteBuffer getContent(ArchiveFile file, ArchiveEntry entry) {
+        return null;
     }
 
     @Override

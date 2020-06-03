@@ -1,11 +1,19 @@
 package org.swdc.archive.core.archive;
 
 import javafx.stage.FileChooser;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.formats.creators.CreatorView;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public interface FileArchiver {
@@ -41,5 +49,25 @@ public interface FileArchiver {
     ArchiveFile loadFile(File file);
 
     boolean creatable();
+
+    ByteBuffer getContent(ArchiveFile file, ArchiveEntry entry);
+
+    default String getMime(ArchiveFile file, ArchiveEntry entry) {
+        ByteBuffer byteBuffer = getContent(file,entry);
+        if (byteBuffer == null) {
+            return null;
+        }
+        BufferedInputStream bin = new BufferedInputStream(new ByteArrayInputStream(byteBuffer.array()));
+        TikaConfig config = TikaConfig.getDefaultConfig();
+        Detector detector = config.getDetector();
+        Metadata metadata = new Metadata();
+        metadata.add(Metadata.RESOURCE_NAME_KEY, entry.getFileName());
+        try {
+            MediaType type = detector.detect(bin,metadata);
+            return type.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 }

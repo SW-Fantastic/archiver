@@ -2,13 +2,38 @@ package org.swdc.archive.core;
 
 import javafx.application.Platform;
 import org.swdc.archive.core.archive.ArchiveResolver;
+import org.swdc.archive.core.viewer.AbstractViewer;
+import org.swdc.archive.ui.UIUtil;
 import org.swdc.archive.ui.view.dialog.PasswordView;
+import org.swdc.fx.FXView;
 import org.swdc.fx.services.Service;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ArchiveService extends Service {
+
+    public void preview(ArchiveFile file, ArchiveEntry entry) {
+        if (entry.isDictionary()) {
+            return;
+        }
+        ArchiveResolver resolver = (ArchiveResolver) findComponent(file.getResolver());
+        String mime = resolver.getMime(file,entry);
+        if (mime == null){
+            UIUtil.notification("此格式暂时无法预览：" + entry.getFileName(),this);
+            return;
+        }
+        List<AbstractViewer> viewers = getScoped(AbstractViewer.class);
+        for (AbstractViewer viewer: viewers) {
+            if (viewer.support(mime)) {
+                FXView view = viewer.loadFromArchive(file,entry);
+                view.show();
+                return;
+            }
+        }
+        UIUtil.notification("此格式暂时无法预览：" + mime,this);
+    }
 
     private void checkPassword(ArchiveFile file, Runnable next) {
         Platform.runLater(() -> {

@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 import org.swdc.archive.config.AppConfig;
 import org.swdc.archive.core.archive.ArchiveResolver;
 import org.swdc.archive.core.archive.ArchiveResolverManager;
+import org.swdc.archive.core.viewer.ViewerManager;
 import org.swdc.archive.ui.view.MainView;
 import org.swdc.fx.FXApplication;
 import org.swdc.fx.FXSplash;
@@ -36,6 +37,7 @@ public class ArchiverApplication extends FXApplication {
     @Override
     protected void onStart(ApplicationContainer container) {
         container.register(ArchiveResolverManager.class);
+        container.register(ViewerManager.class);
     }
 
     @Override

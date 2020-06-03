@@ -6,6 +6,7 @@ module fxArchive {
     requires javafx.graphics;
     requires slf4j.api;
     requires org.controlsfx.controls;
+    requires org.apache.tika.core;
 
     requires lombok;
     requires fx.framework.core;
@@ -17,6 +18,13 @@ module fxArchive {
     requires sevenzipjbinding;
     requires sevenzipjbinding.all.platforms;
     requires cpdetector;
+
+    opens org.swdc.archive.core.viewer to
+            fx.framework.core;
+
+    opens org.swdc.archive.core.viewer.views to
+            fx.framework.core,
+            javafx.fxml;
 
     opens org.swdc.archive.ui.view to
             javafx.fxml,

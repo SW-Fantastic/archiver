@@ -130,6 +130,8 @@ public class ArchiveViewController extends FXController {
                         contentTable.getItems().addAll(treeEntry.getValue().getChildren());
                     }
                 }
+            } else {
+                archiveService.preview(entry.getFile(),entry);
             }
         }
     }

@@ -7,6 +7,10 @@ import net.sf.sevenzipjbinding.*;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileOutStream;
 import org.apache.commons.compress.archivers.sevenz.*;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
 import org.swdc.archive.core.archive.ArchiveResolver;
@@ -269,8 +273,64 @@ public class SevenZArchiveResolver extends ArchiveResolver implements SevenZipSu
     }
 
     @Override
+    public String getMime(ArchiveFile file, ArchiveEntry entry) {
+        try {
+            SevenZFile sevenZFile = new SevenZFile(file.getFile());
+            Iterable<SevenZArchiveEntry> entiters = sevenZFile.getEntries();
+            Iterator<SevenZArchiveEntry> iter = entiters.iterator();
+            String path = entry.getPath().substring(1);
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            while (iter.hasNext()) {
+                SevenZArchiveEntry target = iter.next();
+                if (target.getName().equals(path)) {
+                    InputStream in = new BufferedInputStream(sevenZFile.getInputStream(target));
+                    TikaConfig config = TikaConfig.getDefaultConfig();
+                    Detector detector = config.getDetector();
+                    Metadata metadata = new Metadata();
+                    metadata.add(Metadata.RESOURCE_NAME_KEY, entry.getFileName());
+                    try {
+                        MediaType type = detector.detect(in,metadata);
+                        return type.toString();
+                    } catch (Exception e) {
+                        return null;
+                    } finally {
+                        in.close();
+                    }
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("fail to read content", e);
+            return null;
+        }
+    }
+
+    @Override
     public ByteBuffer getContent(ArchiveFile file, ArchiveEntry entry) {
-        return null;
+        try {
+            SevenZFile sevenZFile = new SevenZFile(file.getFile());
+            Iterable<SevenZArchiveEntry> entiters = sevenZFile.getEntries();
+            Iterator<SevenZArchiveEntry> iter = entiters.iterator();
+            String path = entry.getPath().substring(1);
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            while (iter.hasNext()) {
+                SevenZArchiveEntry target = iter.next();
+                if (target.getName().equals(path)) {
+                    InputStream in = sevenZFile.getInputStream(target);
+                    ByteBuffer result = ByteBuffer.wrap(in.readAllBytes());
+                    in.close();
+                    return result;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("fail to read content", e);
+            return null;
+        }
     }
 
     @Override

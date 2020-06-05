@@ -18,7 +18,7 @@ public class ImageViewer extends AbstractViewer {
     @Override
     public boolean support(String mimeType) {
         String mime = mimeType.toLowerCase();
-        if (mime.equals("png") || mime.endsWith("jpeg")||mime.endsWith("gif")) {
+        if (mime.endsWith("png") || mime.endsWith("jpeg")||mime.endsWith("gif")) {
             return true;
         }
         return false;

@@ -23,7 +23,6 @@ import org.swdc.archive.ui.view.ProgressView;
 import org.swdc.archive.ui.view.dialog.PasswordView;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -37,13 +36,10 @@ public class ZipArchiveResolver extends ArchiveResolver {
 
     private ProgressView progressView = null;
 
-    private PasswordView passwordView = null;
-
     @Override
     public void initialize() {
         Platform.runLater(() -> {
             this.progressView = findView(ProgressView.class);
-            this.passwordView = findView(PasswordView.class);
         });
     }
 
@@ -328,10 +324,10 @@ public class ZipArchiveResolver extends ArchiveResolver {
         }
         try {
             ZipFile zipFile = new ZipFile(file.getFile());
+            zipFile.setCharset(file.getCharset());
             if (zipFile.isEncrypted()) {
                 zipFile.setPassword(file.getPassword().toCharArray());
             }
-            zipFile.setCharset(file.getCharset());
             FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
             InputStream in = zipFile.getInputStream(header);
             ByteBuffer data = ByteBuffer.wrap(in.readAllBytes());
@@ -355,10 +351,12 @@ public class ZipArchiveResolver extends ArchiveResolver {
             metadata.add(Metadata.RESOURCE_NAME_KEY, entry.getFileName());
 
             ZipFile zipFile = new ZipFile(file.getFile());
+            zipFile.setCharset(file.getCharset());
+
             if (zipFile.isEncrypted()) {
                 zipFile.setPassword(file.getPassword().toCharArray());
             }
-            zipFile.setCharset(file.getCharset());
+
             FileHeader header = zipFile.getFileHeader(entry.getPath().substring(1));
             InputStream in = new BufferedInputStream(zipFile.getInputStream(header));
             MediaType type = detector.detect(in,metadata);

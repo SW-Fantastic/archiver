@@ -148,6 +148,26 @@
   -fx-font-family: "Noto Sans CJK DemiLight";
   -fx-font-size: 14;
 }
+.scene .scroll,
+.scene .scroll * {
+  -fx-background-color: rgba(255, 255, 255, 0.3);
+}
+.scene .scroll .scroll-bar,
+.scene .scroll * .scroll-bar {
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-font-size: 8;
+}
+.scene .scroll .scroll-bar .thumb,
+.scene .scroll * .scroll-bar .thumb {
+  -fx-background-color: #74a982;
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .scroll .scroll-bar .track,
+.scene .scroll * .scroll-bar .track {
+  -fx-background-color: rgba(255, 255, 255, 0.6);
+  -fx-border-color: #74a982;
+  -fx-border-radius: 12;
+}
 .scene .content-view {
   -fx-background-color: rgba(255, 255, 255, 0.6);
   -fx-background-radius: 12;

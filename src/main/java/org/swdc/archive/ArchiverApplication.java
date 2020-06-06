@@ -1,5 +1,6 @@
 package org.swdc.archive;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
@@ -51,6 +52,7 @@ public class ArchiverApplication extends FXApplication {
         for (ArchiveResolver resolverItem: resolvers) {
             if (file.getName().endsWith(resolverItem.getExtension())) {
                 resolver = resolverItem;
+                break;
             }
         }
         if (resolver == null) {
@@ -60,11 +62,13 @@ public class ArchiverApplication extends FXApplication {
         ArchiveResolver archiveResolver = resolver;
         CompletableFuture.supplyAsync(() -> archiveResolver.loadFile(file))
                 .whenComplete((archiveFile,e) -> {
-                    if(archiveFile != null) {
-                        mainView.setArchiveFile(archiveFile);
-                        mainView.getStage().setTitle(archiveFile.getFile().getName() + " - 压缩管理");
-                        mainView.show();
-                    }
+                    Platform.runLater(() -> {
+                        if(archiveFile != null) {
+                            mainView.setArchiveFile(archiveFile);
+                            mainView.getStage().setTitle(archiveFile.getFile().getName() + " - 压缩管理");
+                            mainView.show();
+                        }
+                    });
                 });
     }
 

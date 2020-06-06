@@ -31,7 +31,7 @@ public class DataUtil {
 
     public static CodepageDetectorProxy getCodePageDetector() {
         CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
-        detector.add(new ParsingDetector(false));
+        //detector.add(new ParsingDetector(false));
         detector.add(UnicodeDetector.getInstance());
         detector.add(JChardetFacade.getInstance());
         detector.add(ASCIIDetector.getInstance());

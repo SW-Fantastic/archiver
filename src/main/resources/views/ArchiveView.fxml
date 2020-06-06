@@ -12,7 +12,7 @@
    <center>
       <SplitPane dividerPositions="0.3090128755364807" prefHeight="436.0" prefWidth="628.0" BorderPane.alignment="CENTER">
          <items>
-            <SplitPane dividerPositions="0.5" minWidth="230.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+            <SplitPane dividerPositions="0.5" maxWidth="285.0" minWidth="230.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
                <items>
                   <TreeView id="archiveTree" fx:id="archiveTree" prefHeight="200.0" prefWidth="200.0" />
                   <BorderPane prefHeight="200.0" prefWidth="200.0">

@@ -21,6 +21,9 @@
                 <MenuItem mnemonicParsing="false" onAction="#extractSelected" text="解压选择的文件" />
               </items>
             </MenuButton>
+            <Separator orientation="VERTICAL" prefHeight="0.0" prefWidth="0.0" />
+            <Button id="btnProp" mnemonicParsing="false" onAction="#showProperties" prefHeight="48.0" prefWidth="48.0" text="prop" />
+            <Button id="btnConf" layoutX="166.0" layoutY="13.0" mnemonicParsing="false" onAction="#onConfig" prefHeight="48.0" prefWidth="48.0" text="conf" />
         </items>
       </ToolBar>
    </top>

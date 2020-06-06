@@ -5,12 +5,13 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.swdc.archive.core.ArchiveEntry;
 import org.swdc.archive.core.ArchiveFile;
+import org.swdc.archive.ui.view.dialog.ConfigureView;
+import org.swdc.archive.ui.view.dialog.FilePropertyView;
 import org.swdc.fx.FXView;
 import org.swdc.fx.anno.Aware;
 import org.swdc.fx.anno.Scope;
@@ -32,6 +33,12 @@ public class MainView extends FXView {
     @Aware
     private ArchiveView archiveView = null;
 
+    @Aware
+    private ConfigureView configureView = null;
+
+    @Aware
+    private FilePropertyView propertyView = null;
+
     private SimpleDoubleProperty contentWidthProp = new SimpleDoubleProperty();
 
     private SimpleDoubleProperty contentHeightProp = new SimpleDoubleProperty();
@@ -46,7 +53,8 @@ public class MainView extends FXView {
     public void initialize() {
         this.configButtonIcon("addFile", "plus","向当前位置添加文件",writeable);
         this.configButtonIcon("removeFile","trash", "移除此处的文件",writeable);
-
+        this.configButtonIcon("btnProp","list_alt","文件属性",readable);
+        this.configButtonIcon("btnConf","gear","设置",null);
         MenuButton unArchive = findById("unarchivedp");
         unArchive.setPadding(new Insets(4,4,4,4));
         unArchive.setFont(fontawsomeService.getFont(FontSize.MIDDLE));
@@ -86,7 +94,9 @@ public class MainView extends FXView {
         button.setText(fontawsomeService.getFontIcon(iconName));
         button.setPadding(new Insets(4,4,4,4));
         button.setTooltip(new Tooltip(tooltip));
-        button.disableProperty().bind(enable.not());
+        if (enable!=null){
+            button.disableProperty().bind(enable.not());
+        }
     }
 
     public synchronized void setArchiveFile(ArchiveFile archiveFile) {
@@ -98,6 +108,15 @@ public class MainView extends FXView {
         if (archiveFile.isWriteable()) {
             writeable.setValue(true);
         }
+        propertyView.setArchive(archiveFile);
+    }
+
+    public void showProperty() {
+        this.propertyView.show();
+    }
+
+    public void showConfigure() {
+        this.configureView.show();
     }
 
     public synchronized ArchiveFile getArchiveFile() {

@@ -81,4 +81,16 @@ public class MainController extends FXController {
         archiveService.extract(file,selected,target);
     }
 
+    @FXML
+    public void showProperties() {
+        MainView view = getView();
+        view.showProperty();
+    }
+
+    @FXML
+    public void onConfig() {
+        MainView view = getView();
+        view.showConfigure();
+    }
+
 }

@@ -46,6 +46,18 @@
       -fx-font-size: 14;
     }
   }
+  .prop-sheets {
+    -fx-background: rgba(245,237,240, 0.2);
+    .button {
+      .btn-blocked(@color-dark-green,@color-background);
+    }
+    .combo-box {
+      .combo-box(@color-dark-green, @color-background)
+    }
+    .slider {
+      .scrollable(@color-dark-green);
+    }
+  }
   .progress-bar {
     .track {
       -fx-background-color: @color-noting;

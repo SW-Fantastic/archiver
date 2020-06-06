@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="447.0" prefWidth="488.0" styleClass="scene" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swdc.archive.ui.controller.dialog.ConfigureController">
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" prefHeight="52.0" prefWidth="488.0" spacing="8.0" styleClass="content-view" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <children>
+            <Button mnemonicParsing="false" onAction="#cancel" prefHeight="28.0" prefWidth="64.0" styleClass="btn-block" text="取消" />
+            <Button mnemonicParsing="false" onAction="#save" prefHeight="28.0" prefWidth="64.0" styleClass="btn-block" text="确定" />
+         </children>
+         <padding>
+            <Insets right="16.0" />
+         </padding>
+      </HBox>
+   </bottom>
+   <center>
+      <BorderPane id="content" prefHeight="200.0" prefWidth="200.0" styleClass="content-view" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

@@ -80,6 +80,62 @@
 .scene .tool-bar .tooltip {
   -fx-font-size: 14;
 }
+.scene .prop-sheets {
+  -fx-background: rgba(245, 237, 240, 0.2);
+}
+.scene .prop-sheets .button {
+  -fx-background-color: #74a982;
+  -fx-text-fill: #fffcf2;
+  -fx-border-width: 1px;
+  -fx-border-color: rgba(255, 255, 255, 0);
+  -fx-background-radius: 8;
+}
+.scene .prop-sheets .button:hover {
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .prop-sheets .button > .label {
+  -fx-background-color: #74a982;
+  -fx-text-fill: #fffcf2;
+}
+.scene .prop-sheets .button .arrow {
+  -fx-background-color: #fffcf2;
+}
+.scene .prop-sheets .combo-box {
+  -fx-border-color: #74a982;
+  -fx-border-style: solid;
+  -fx-border-width: 0 0 1.5 0;
+  -fx-background-color: rgba(255, 255, 255, 0);
+}
+.scene .prop-sheets .combo-box .list-view {
+  -fx-text-fill: #74a982;
+  -fx-background-color: #fffcf2;
+}
+.scene .prop-sheets .combo-box .list-view .list-cell:selected * {
+  -fx-text-fill: #fffcf2;
+  -fx-background-color: #74a982;
+}
+.scene .prop-sheets .combo-box .list-view .list-cell:hover,
+.scene .prop-sheets .combo-box .list-view .list-cell:focused {
+  -fx-text-fill: #fffcf2;
+  -fx-background-color: #74a982;
+}
+.scene .prop-sheets .combo-box .list-view .list-cell:hover *,
+.scene .prop-sheets .combo-box .list-view .list-cell:focused * {
+  -fx-text-fill: #fffcf2;
+}
+.scene .prop-sheets .slider {
+  -fx-background-color: rgba(255, 255, 255, 0);
+  -fx-font-size: 8;
+}
+.scene .prop-sheets .slider .thumb {
+  -fx-background-color: #74a982;
+  -fx-effect: dropshadow(three-pass-box, #74a982, 8, 0, 0, 0);
+}
+.scene .prop-sheets .slider .track {
+  -fx-background-color: rgba(255, 255, 255, 0.6);
+  -fx-border-color: #74a982;
+  -fx-border-radius: 12;
+}
 .scene .progress-bar .track {
   -fx-background-color: rgba(255, 255, 255, 0);
   -fx-border-color: #55917f;

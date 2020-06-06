@@ -15,24 +15,26 @@ import java.util.concurrent.CompletableFuture;
 public class ArchiveService extends Service {
 
     public void preview(ArchiveFile file, ArchiveEntry entry) {
-        if (entry.isDictionary()) {
-            return;
-        }
-        ArchiveResolver resolver = (ArchiveResolver) findComponent(file.getResolver());
-        String mime = resolver.getMime(file,entry);
-        if (mime == null){
-            UIUtil.notification("此格式暂时无法预览：" + entry.getFileName(),this);
-            return;
-        }
-        List<AbstractViewer> viewers = getScoped(AbstractViewer.class);
-        for (AbstractViewer viewer: viewers) {
-            if (viewer.support(mime)) {
-                FXView view = viewer.loadFromArchive(file,entry);
-                view.show();
+        this.checkPassword(file, () -> {
+            if (entry.isDictionary()) {
                 return;
             }
-        }
-        UIUtil.notification("此格式暂时无法预览：" + mime,this);
+            ArchiveResolver resolver = (ArchiveResolver) findComponent(file.getResolver());
+            String mime = resolver.getMime(file,entry);
+            if (mime == null){
+                UIUtil.notification("此格式暂时无法预览：" + entry.getFileName(),this);
+                return;
+            }
+            List<AbstractViewer> viewers = getScoped(AbstractViewer.class);
+            for (AbstractViewer viewer: viewers) {
+                if (viewer.support(mime)) {
+                    FXView view = viewer.loadFromArchive(file,entry);
+                    view.show();
+                    return;
+                }
+            }
+            UIUtil.notification("此格式暂时无法预览：" + mime,this);
+        });
     }
 
     private void checkPassword(ArchiveFile file, Runnable next) {

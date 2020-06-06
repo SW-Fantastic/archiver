@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="403.0" styleClass="scene" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <GridPane styleClass="content-view" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="99.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="429.0" minWidth="10.0" prefWidth="304.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="231.0" minHeight="36.0" prefHeight="36.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="267.0" minHeight="36.0" prefHeight="36.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="346.0" minHeight="36.0" prefHeight="36.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="346.0" minHeight="36.0" prefHeight="36.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="346.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="346.0" minHeight="10.0" prefHeight="191.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="文件名：" GridPane.rowIndex="1" />
+            <TextField id="txtName" editable="false" prefHeight="28.0" prefWidth="304.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField id="txtPath" editable="false" prefHeight="29.0" prefWidth="292.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="路径：" GridPane.rowIndex="2" />
+            <Label text="文件大小：" GridPane.rowIndex="3" />
+            <TextField id="txtSize" editable="false" prefHeight="29.0" prefWidth="292.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="安全性：" GridPane.rowIndex="4" />
+            <CheckBox id="chkSafe" disable="true" mnemonicParsing="false" text="加密的文件" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+         </children>
+         <BorderPane.margin>
+            <Insets left="12.0" right="24.0" />
+         </BorderPane.margin>
+      </GridPane>
+   </center>
+</BorderPane>

@@ -61,6 +61,7 @@ module fxArchive {
             fx.framework.core;
 
     opens org.swdc.archive.config to
+            org.controlsfx.controls,
             fx.framework.core;
 
     opens views to

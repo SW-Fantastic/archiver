@@ -5,10 +5,11 @@ import lombok.Setter;
 import org.swdc.fx.anno.ConfigProp;
 import org.swdc.fx.anno.PropType;
 import org.swdc.fx.anno.Properties;
+import org.swdc.fx.properties.DefaultUIConfigProp;
 import org.swdc.fx.properties.FXProperties;
 
 @Properties(value = "config.properties", prefix = "app")
-public class AppConfig extends FXProperties {
+public class AppConfig extends DefaultUIConfigProp {
 
     @Getter
     @Setter
